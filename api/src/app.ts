@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 //import axios from 'axios'
-import line from '@line/bot-sdk'
+//import line from '@line/bot-sdk'
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
@@ -27,6 +27,23 @@ const app = express()
 app.use(express.json())
 
 //webhook path
+app.post('/callback', (req: Request, res: Response) => {
+    const body = req.body
+    if (!body) {
+        res.send('Bad Request').status(400)
+        return
+    }
+    if (body.events) {
+        for (let i = 0; i < body.events.length; i++) {
+            if (body.events[i].type === 'follow') {
+                console.log(body.events[i].source.userId)
+            }
+        }
+    }
+    res.status(200)
+})
+
+//test path
 app.get('/test', (req: Request, res: Response) => {
     const userId = req.query.id as string
     const message = {
