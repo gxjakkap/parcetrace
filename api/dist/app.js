@@ -27,10 +27,6 @@ app.use(express_1.default.json());
 //webhook path
 app.post('/callback', (req, res) => {
     const body = req.body;
-    if (!body) {
-        res.send('Bad Request').status(400);
-        return;
-    }
     if (body.events) {
         for (let i = 0; i < body.events.length; i++) {
             if (body.events[i].type === 'follow') {
