@@ -4,6 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+//import axios from 'axios'
+//import line from '@line/bot-sdk'
 const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
@@ -23,6 +25,22 @@ const app = (0, express_1.default)();
 //use json middleware
 app.use(express_1.default.json());
 //webhook path
+app.post('/callback', (req, res) => {
+    const body = req.body;
+    if (!body) {
+        res.send('Bad Request').status(400);
+        return;
+    }
+    if (body.events) {
+        for (let i = 0; i < body.events.length; i++) {
+            if (body.events[i].type === 'follow') {
+                console.log(body.events[i].source.userId);
+            }
+        }
+    }
+    res.status(200);
+});
+//test path
 app.get('/test', (req, res) => {
     const userId = req.query.id;
     const message = {
