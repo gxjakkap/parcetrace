@@ -34,7 +34,8 @@ app.post('/callback', (req, res) => {
             }
         }
     }
-    res.status(200);
+    console.log('triggered');
+    res.send('OK').status(200);
 });
 //test path
 app.get('/test', (req, res) => {
