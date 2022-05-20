@@ -29,6 +29,10 @@ const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFi
     })
 }
 
+const dbSetOnUnfollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+    await ref.delete()
+}
+
 //https
 const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
 const sslCertificate = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
@@ -65,7 +69,8 @@ app.post('/webhook', (req: Request, res: Response) => {
                     })
             }
             else if (body.events[i].type === 'unfollow') {
-
+                const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
+                dbSetOnUnfollow(docRef)
             }
         }
     }

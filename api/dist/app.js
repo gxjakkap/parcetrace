@@ -36,6 +36,9 @@ const dbSetOnFollow = (ref, userId, displayName, picLink) => __awaiter(void 0, v
         piclink: picLink
     });
 });
+const dbSetOnUnfollow = (ref) => __awaiter(void 0, void 0, void 0, function* () {
+    yield ref.delete();
+});
 //https
 const sslPrivkey = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem");
 const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem");
@@ -67,6 +70,8 @@ app.post('/webhook', (req, res) => {
                 });
             }
             else if (body.events[i].type === 'unfollow') {
+                const docRef = db.collection('friends').doc(body.events[i].source.userId);
+                dbSetOnUnfollow(docRef);
             }
         }
     }
