@@ -57,7 +57,7 @@ app.post('/webhook', (req: Request, res: Response) => {
                 axios.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`)
                     .then(data => {
                         const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
-                        dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl)
+                        dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err) })
                     })
             }
             else if (body.events[i].type === 'unfollow') {

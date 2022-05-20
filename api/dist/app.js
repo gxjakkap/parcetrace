@@ -59,7 +59,7 @@ app.post('/webhook', (req, res) => {
                 axios_1.default.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`)
                     .then(data => {
                     const docRef = db.collection('friends').doc(body.events[i].source.userId);
-                    dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl);
+                    dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err); });
                 });
             }
             else if (body.events[i].type === 'unfollow') {
