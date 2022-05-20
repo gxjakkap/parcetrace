@@ -66,7 +66,7 @@ app.post('/webhook', (req: Request, res: Response) => {
         }
     }
     console.log('webhook recieved')
-    res.status(200)
+    res.json({}).status(200)
 })
 
 //test path

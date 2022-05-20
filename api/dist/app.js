@@ -67,7 +67,7 @@ app.post('/webhook', (req, res) => {
         }
     }
     console.log('webhook recieved');
-    res.status(200);
+    res.json({}).status(200);
 });
 //test path
 app.get('/test', (req, res) => {
