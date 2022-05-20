@@ -13,13 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-//import axios from 'axios'
-const bot_sdk_1 = __importDefault(require("@line/bot-sdk"));
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
 const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
+const greetings_1 = require("./greetings");
 //set port
 const port = process.env.port || 3000;
 //get credentials path
@@ -45,10 +44,10 @@ const dbSetOnUnfollow = (ref) => __awaiter(void 0, void 0, void 0, function* () 
 const sslPrivkey = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem");
 const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem");
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate };
-//init line client from line sdk
-const lineClient = new bot_sdk_1.default.Client({
-    channelAccessToken: process.env.CAT
-});
+/* //init line client from line sdk
+const lineClient = new line.Client({
+    channelAccessToken: process.env.CAT as string
+}) */
 const channelAccessToken = process.env.CAT;
 //init express app
 const app = (0, express_1.default)();
@@ -67,8 +66,7 @@ app.post('/webhook', (req, res) => {
                     }
                 })
                     .then(data => {
-                    let message = { type: 'text', text: `Test greeting text, Hi ${data.data.displayName}!` }; // greeting message
-                    lineClient.pushMessage(body.events[i].source.userId, message);
+                    (0, greetings_1.sendGreetingMessage)(body.events[i].source.userId, channelAccessToken, data.data.displayName).catch(err => { console.log(err); });
                     const docRef = db.collection('friends').doc(body.events[i].source.userId);
                     dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err); });
                 });
@@ -82,40 +80,6 @@ app.post('/webhook', (req, res) => {
     console.log('webhook recieved');
     res.json({}).status(200);
 });
-//test path
-app.get('/test', (req, res) => {
-    const userId = req.query.id;
-    const message = {
-        to: userId,
-        messages: [
-            {
-                type: 'text',
-                text: 'Hello World.'
-            }
-        ]
-    };
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${channelAccessToken}`
-    };
-    axios_1.default.post('https://api.line.me/v2/bot/message/push', message, headers)
-        .then(() => {
-        res.send(`Sent message to ${userId}`);
-    })
-        .catch(err => {
-        console.log(err);
-    });
-    /* client.pushMessage(userId, message as any)
-        .then(() => {
-            res.send(`Sent message to ${userId}`)
-        })
-        .catch(err => {
-            console.log(err)
-        }) */
-});
-/* app.listen(port, () => {
-    console.log(`App listening on port ${port}`)
-}) */
 https_1.default.createServer(sslCredentials, app)
     .listen(port, () => {
     console.log(`App listening on port ${port}`);

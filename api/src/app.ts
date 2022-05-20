@@ -1,4 +1,4 @@
-import express, { Request, Response, text } from 'express'
+import express, { Request, Response } from 'express'
 //import axios from 'axios'
 import line from '@line/bot-sdk'
 import { initializeApp, applicationDefault, cert } from 'firebase-admin/app'
@@ -6,6 +6,7 @@ import { getFirestore, Timestamp, FieldValue, DocumentReference } from 'firebase
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
+import { sendGreetingMessage } from './greetings'
 
 //set port
 const port = process.env.port || 3000
@@ -38,11 +39,10 @@ const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/priv
 const sslCertificate = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate }
 
-//init line client from line sdk
+/* //init line client from line sdk
 const lineClient = new line.Client({
     channelAccessToken: process.env.CAT as string
-})
-
+}) */
 const channelAccessToken = process.env.CAT
 
 //init express app
@@ -64,8 +64,7 @@ app.post('/webhook', (req: Request, res: Response) => {
                     }
                 })
                     .then(data => {
-                        let message: line.TextMessage = { type: 'text', text: `Test greeting text, Hi ${data.data.displayName}!` } // greeting message
-                        lineClient.pushMessage(body.events[i].source.userId, message)
+                        sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
                         const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
                         dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err) })
                     })
@@ -79,43 +78,6 @@ app.post('/webhook', (req: Request, res: Response) => {
     console.log('webhook recieved')
     res.json({}).status(200)
 })
-
-//test path
-app.get('/test', (req: Request, res: Response) => {
-    const userId = req.query.id as string
-    const message = {
-        to: userId,
-        messages: [
-            {
-                type: 'text',
-                text: 'Hello World.'
-            }
-        ]
-    }
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${channelAccessToken}`
-
-    }
-    axios.post('https://api.line.me/v2/bot/message/push', message, headers as any)
-        .then(() => {
-            res.send(`Sent message to ${userId}`)
-        })
-        .catch(err => {
-            console.log(err)
-        })
-    /* client.pushMessage(userId, message as any)
-        .then(() => {
-            res.send(`Sent message to ${userId}`)
-        })
-        .catch(err => {
-            console.log(err)
-        }) */
-})
-
-/* app.listen(port, () => {
-    console.log(`App listening on port ${port}`)
-}) */
 
 https.createServer(sslCredentials, app)
     .listen(port, () => {
