@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express'
 //import axios from 'axios'
-//import line from '@line/bot-sdk'
+import line from '@line/bot-sdk'
+import { initializeApp, applicationDefault, cert } from 'firebase-admin/app'
+import { getFirestore, Timestamp, FieldValue, DocumentReference } from 'firebase-admin/firestore'
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
@@ -8,10 +10,29 @@ import axios from 'axios'
 //set port
 const port = process.env.port || 3000
 
+//get credentials path
+const firebaseCredPath = process.env.cred as string
+
+//init firestore
+const serviceAccount = require(firebaseCredPath)
+initializeApp({
+    credential: cert(serviceAccount)
+})
+const db = getFirestore()
+
+//async functions for database operation
+const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, userId: string, displayName: string, picLink: string) => {
+    await ref.set({
+        userId: userId,
+        displayName: displayName,
+        piclink: picLink
+    })
+}
+
 //https
-const privkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
-const cert = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
-const credentials = { key: privkey, cert: cert }
+const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
+const sslCertificate = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
+const sslCredentials = { key: sslPrivkey, cert: sslCertificate }
 
 /* //init line client from line sdk
 const client = new line.Client({
@@ -27,17 +48,25 @@ const app = express()
 app.use(express.json())
 
 //webhook path
-app.post('/callback', (req: Request, res: Response) => {
+app.post('/webhook', (req: Request, res: Response) => {
     const body = req.body
     if (body.events) {
         for (let i = 0; i < body.events.length; i++) {
             if (body.events[i].type === 'follow') {
                 console.log(body.events[i].source.userId)
+                axios.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`)
+                    .then(data => {
+                        const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
+                        dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl)
+                    })
+            }
+            else if (body.events[i].type === 'unfollow') {
+
             }
         }
     }
-    console.log('triggered')
-    res.send('OK').status(200)
+    console.log('webhook recieved')
+    res.status(200)
 })
 
 //test path
@@ -77,7 +106,7 @@ app.get('/test', (req: Request, res: Response) => {
     console.log(`App listening on port ${port}`)
 }) */
 
-https.createServer(credentials, app)
+https.createServer(sslCredentials, app)
     .listen(port, () => {
         console.log(`App listening on port ${port}`)
     })
