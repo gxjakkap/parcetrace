@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+//import axios from 'axios'
+const bot_sdk_1 = __importDefault(require("@line/bot-sdk"));
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
 const fs_1 = __importDefault(require("fs"));
@@ -43,10 +45,10 @@ const dbSetOnUnfollow = (ref) => __awaiter(void 0, void 0, void 0, function* () 
 const sslPrivkey = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem");
 const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem");
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate };
-/* //init line client from line sdk
-const client = new line.Client({
-    channelAccessToken: process.env.CAT as string
-}) */
+//init line client from line sdk
+const lineClient = new bot_sdk_1.default.Client({
+    channelAccessToken: process.env.CAT
+});
 const channelAccessToken = process.env.CAT;
 //init express app
 const app = (0, express_1.default)();
@@ -65,6 +67,8 @@ app.post('/webhook', (req, res) => {
                     }
                 })
                     .then(data => {
+                    let message = { type: 'text', text: `Test greeting text, Hi ${data.data.displayName}!` }; // greeting message
+                    lineClient.pushMessage(body.events[i].source.userId, message);
                     const docRef = db.collection('friends').doc(body.events[i].source.userId);
                     dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err); });
                 });

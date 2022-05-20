@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response, text } from 'express'
 //import axios from 'axios'
 import line from '@line/bot-sdk'
 import { initializeApp, applicationDefault, cert } from 'firebase-admin/app'
@@ -38,10 +38,10 @@ const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/priv
 const sslCertificate = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate }
 
-/* //init line client from line sdk
-const client = new line.Client({
+//init line client from line sdk
+const lineClient = new line.Client({
     channelAccessToken: process.env.CAT as string
-}) */
+})
 
 const channelAccessToken = process.env.CAT
 
@@ -64,6 +64,8 @@ app.post('/webhook', (req: Request, res: Response) => {
                     }
                 })
                     .then(data => {
+                        let message: line.TextMessage = { type: 'text', text: `Test greeting text, Hi ${data.data.displayName}!` } // greeting message
+                        lineClient.pushMessage(body.events[i].source.userId, message)
                         const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
                         dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err) })
                     })
