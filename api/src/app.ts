@@ -54,7 +54,11 @@ app.post('/webhook', (req: Request, res: Response) => {
         for (let i = 0; i < body.events.length; i++) {
             if (body.events[i].type === 'follow') {
                 console.log(body.events[i].source.userId)
-                axios.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`)
+                axios.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${channelAccessToken}`
+                    }
+                })
                     .then(data => {
                         const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
                         dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err) })
