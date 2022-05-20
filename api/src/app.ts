@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express'
-//import axios from 'axios'
-import line from '@line/bot-sdk'
+//import line from '@line/bot-sdk'
 import { initializeApp, applicationDefault, cert } from 'firebase-admin/app'
 import { getFirestore, Timestamp, FieldValue, DocumentReference } from 'firebase-admin/firestore'
 import fs from 'fs'
