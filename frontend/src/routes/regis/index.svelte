@@ -21,11 +21,8 @@
     // only allow valid character for each fields
     $: userData.name = userData.name.replace(/[^.a-zA-Zก-๏\s]+$/, "");
     $: userData.surname = userData.surname.replace(/[^a-zA-Zก-๏\s]+$/, "");
-    $: userData.room = userData.room.replace(/[^a-zA-Zก-๏\s]+$/, "");
-    $: userData.phoneNumber = userData.phoneNumber.replace(
-        /[^a-zA-Zก-๏\s]+$/,
-        ""
-    );
+    $: userData.room = userData.room.replace(/[^a-zA-Z0-9\s]+$/, "");
+    $: userData.phoneNumber = userData.phoneNumber.replace(/[^0-9\s]+$/, "");
 
     //post data to api on button click
     async function onSubmit() {
@@ -38,7 +35,15 @@
             alert("กรุณากรอกข้อมูลให้ครบ");
             return;
         }
-        alert(userData.name);
+        if (
+            !/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/.test(
+                userData.phoneNumber
+            )
+        ) {
+            alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
+            return;
+        }
+        alert(userData);
         /* await fetch("https://api.guntxjakka.me/userreg", {
             method: "POST",
             mode: "cors",
@@ -98,7 +103,7 @@
                     />
 
                     <input
-                        type="text"
+                        type="tel"
                         class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
                         placeholder="เบอร์โทรติดต่อ"
                         bind:value={userData.phoneNumber}
@@ -113,7 +118,7 @@
             </div>
         </div>
     {:else}
-        <!--if userId isn't exist/ is null-->
+        <!--if userId doesn't exist/ is null-->
         <div class="bg-gray-200 min-h-screen flex flex-col">
             <div
                 class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
