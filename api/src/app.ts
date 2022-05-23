@@ -5,7 +5,9 @@ import { getFirestore, Timestamp, FieldValue, DocumentReference } from 'firebase
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
+import bearerToken from 'express-bearer-token'
 import { sendGreetingMessage } from './greetings'
+import * as fst from './firestoreoperation'
 
 //set port
 const port = process.env.port || 3000
@@ -19,19 +21,6 @@ initializeApp({
     credential: cert(serviceAccount)
 })
 const db = getFirestore()
-
-//async functions for database operation
-const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, userId: string, displayName: string, picLink: string) => {
-    await ref.set({
-        userId: userId,
-        displayName: displayName,
-        piclink: picLink
-    })
-}
-
-const dbSetOnUnfollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
-    await ref.delete()
-}
 
 //https
 const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
@@ -50,6 +39,10 @@ const app = express()
 //use json middleware
 app.use(express.json())
 
+//use bearer token middleware
+app.use(bearerToken())
+
+
 //webhook path
 app.post('/webhook', (req: Request, res: Response) => {
     const body = req.body
@@ -65,19 +58,36 @@ app.post('/webhook', (req: Request, res: Response) => {
                     .then(data => {
                         sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
                         const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
-                        dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err) })
+                        fst.dbSetOnFollow(docRef, { userId: data.data.userId, displayName: data.data.displayName, picLink: data.data.pictureUrl }).catch(err => { console.log(err) })
                     })
             }
             else if (body.events[i].type === 'unfollow') {
                 const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
-                dbSetOnUnfollow(docRef)
+                fst.dbRemoveOnUnfollow(docRef)
             }
         }
     }
     console.log('webhook recieved')
     res.json({}).status(200)
 })
+/* unfinished
+//parcel register path
+app.post('/parcelreg', (req: Request, res: Response) => {
+    const body = req.body
 
+})
+
+app.post('/userreg', (req: Request, res: Response) => {
+
+    //check for api key
+    if (req.token !== process.env.API_KEY) {
+        res.json({ status: 401, message: "Unauthorized" }).status(401)
+        return
+    }
+    const body = req.body
+
+})
+ */
 https.createServer(sslCredentials, app)
     .listen(port, () => {
         console.log(`App listening on port ${port}`)

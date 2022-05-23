@@ -1,12 +1,26 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -19,7 +33,9 @@ const firestore_1 = require("firebase-admin/firestore");
 const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
+const express_bearer_token_1 = __importDefault(require("express-bearer-token"));
 const greetings_1 = require("./greetings");
+const fst = __importStar(require("./firestoreoperation"));
 //set port
 const port = process.env.port || 3000;
 //get credentials path
@@ -30,17 +46,6 @@ const serviceAccount = require(firebaseCredPath);
     credential: (0, app_1.cert)(serviceAccount)
 });
 const db = (0, firestore_1.getFirestore)();
-//async functions for database operation
-const dbSetOnFollow = (ref, userId, displayName, picLink) => __awaiter(void 0, void 0, void 0, function* () {
-    yield ref.set({
-        userId: userId,
-        displayName: displayName,
-        piclink: picLink
-    });
-});
-const dbSetOnUnfollow = (ref) => __awaiter(void 0, void 0, void 0, function* () {
-    yield ref.delete();
-});
 //https
 const sslPrivkey = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem");
 const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem");
@@ -54,6 +59,8 @@ const channelAccessToken = process.env.CAT;
 const app = (0, express_1.default)();
 //use json middleware
 app.use(express_1.default.json());
+//use bearer token middleware
+app.use((0, express_bearer_token_1.default)());
 //webhook path
 app.post('/webhook', (req, res) => {
     const body = req.body;
@@ -69,18 +76,36 @@ app.post('/webhook', (req, res) => {
                     .then(data => {
                     (0, greetings_1.sendGreetingMessage)(body.events[i].source.userId, channelAccessToken, data.data.displayName).catch(err => { console.log(err); });
                     const docRef = db.collection('friends').doc(body.events[i].source.userId);
-                    dbSetOnFollow(docRef, data.data.userId, data.data.displayName, data.data.pictureUrl).catch(err => { console.log(err); });
+                    fst.dbSetOnFollow(docRef, { userId: data.data.userId, displayName: data.data.displayName, picLink: data.data.pictureUrl }).catch(err => { console.log(err); });
                 });
             }
             else if (body.events[i].type === 'unfollow') {
                 const docRef = db.collection('friends').doc(body.events[i].source.userId);
-                dbSetOnUnfollow(docRef);
+                fst.dbRemoveOnUnfollow(docRef);
             }
         }
     }
     console.log('webhook recieved');
     res.json({}).status(200);
 });
+/* unfinished
+//parcel register path
+app.post('/parcelreg', (req: Request, res: Response) => {
+    const body = req.body
+
+})
+
+app.post('/userreg', (req: Request, res: Response) => {
+
+    //check for api key
+    if (req.token !== process.env.API_KEY) {
+        res.json({ status: 401, message: "Unauthorized" }).status(401)
+        return
+    }
+    const body = req.body
+
+})
+ */
 https_1.default.createServer(sslCredentials, app)
     .listen(port, () => {
     console.log(`App listening on port ${port}`);
