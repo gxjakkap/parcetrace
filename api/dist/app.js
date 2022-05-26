@@ -34,7 +34,6 @@ const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
 const cors_1 = __importDefault(require("cors"));
-const express_bearer_token_1 = __importDefault(require("express-bearer-token"));
 const greetings_1 = require("./greetings");
 const fst = __importStar(require("./firestoreoperation"));
 //set port
@@ -60,8 +59,6 @@ const channelAccessToken = process.env.CAT;
 const app = (0, express_1.default)();
 //use json middleware
 app.use(express_1.default.json());
-//use bearer token middleware
-app.use((0, express_bearer_token_1.default)());
 //define cors option //TODO: change to allow origin
 const corsOption = {
     origin: '*',
@@ -103,11 +100,13 @@ app.post('/parcelreg', (req, res) => {
 });
 app.post('/userreg', (req, res) => {
     //check for api key
-    if (req.token !== process.env.API_KEY) {
+    if (req.headers.authorization !== process.env.API_KEY) {
         res.json({ status: 401, message: "Unauthorized" }).status(401);
         console.log('Unauthorized request recieved');
-        console.log(req.token);
+        console.log(req.headers.authorization);
         console.log(process.env.API_KEY);
+        console.log(req.body);
+        console.log(req.headers);
         return;
     }
     const data = req.body;

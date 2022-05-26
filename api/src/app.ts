@@ -40,9 +40,6 @@ const app = express()
 //use json middleware
 app.use(express.json())
 
-//use bearer token middleware
-app.use(bearerToken())
-
 //define cors option //TODO: change to allow origin
 const corsOption = {
     origin: '*',
@@ -90,11 +87,13 @@ app.post('/parcelreg', (req: Request, res: Response) => {
 app.post('/userreg', (req: Request, res: Response) => {
 
     //check for api key
-    if (req.token !== process.env.API_KEY) {
+    if (req.headers.authorization !== process.env.API_KEY) {
         res.json({ status: 401, message: "Unauthorized" }).status(401)
         console.log('Unauthorized request recieved')
-        console.log(req.token)
+        console.log(req.headers.authorization)
         console.log(process.env.API_KEY)
+        console.log(req.body)
+        console.log(req.headers)
         return
     }
     const data = req.body
