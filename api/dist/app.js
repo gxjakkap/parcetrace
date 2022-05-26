@@ -33,6 +33,7 @@ const firestore_1 = require("firebase-admin/firestore");
 const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
+const cors_1 = __importDefault(require("cors"));
 const express_bearer_token_1 = __importDefault(require("express-bearer-token"));
 const greetings_1 = require("./greetings");
 const fst = __importStar(require("./firestoreoperation"));
@@ -61,6 +62,14 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 //use bearer token middleware
 app.use((0, express_bearer_token_1.default)());
+//define cors option //TODO: change to allow origin
+const corsOption = {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    optionSuccessStatus: 200
+};
+//use cors middleware
+app.use((0, cors_1.default)(corsOption));
 //webhook path
 app.post('/webhook', (req, res) => {
     const body = req.body;

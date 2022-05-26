@@ -5,6 +5,7 @@ import { getFirestore, Timestamp, FieldValue, DocumentReference } from 'firebase
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
+import cors from 'cors'
 import bearerToken from 'express-bearer-token'
 import { sendGreetingMessage } from './greetings'
 import * as fst from './firestoreoperation'
@@ -41,6 +42,16 @@ app.use(express.json())
 
 //use bearer token middleware
 app.use(bearerToken())
+
+//define cors option //TODO: change to allow origin
+const corsOption = {
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    optionSuccessStatus: 200
+}
+
+//use cors middleware
+app.use(cors(corsOption))
 
 
 //webhook path
