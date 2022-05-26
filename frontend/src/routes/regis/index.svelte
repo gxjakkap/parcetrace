@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
+    import { API_KEY } from "$lib/env";
 
     //get userId params from url (https://domain.ext/reqis?userId="userId")
     let userId: string | null = $page.url.searchParams.get("userId") || null;
@@ -43,16 +44,16 @@
             alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
             return;
         }
-        alert(userData);
-        /* await fetch("https://api.guntxjakka.me/userreg", {
+        await fetch("https://api.guntxjakka.me/userreg", {
             method: "POST",
             mode: "cors",
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "Bearer ".concat(process.env.API_KEY as string),
+                Authorization: "Bearer ".concat(API_KEY),
             },
-        }); */
+            body: JSON.stringify(userData),
+        });
     }
 </script>
 
