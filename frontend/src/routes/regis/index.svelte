@@ -2,6 +2,14 @@
     import { page } from "$app/stores";
     import { API_KEY } from "$lib/env";
 
+    let apikey: string = "";
+
+    if (process.env.NODE_ENV === "production") {
+        apikey = process.env.API_KEY as string;
+    } else {
+        apikey = API_KEY;
+    }
+
     //get userId params from url (https://domain.ext/reqis?userId="userId")
     let userId: string | null = $page.url.searchParams.get("userId") || null;
 
