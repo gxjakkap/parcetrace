@@ -16,7 +16,7 @@ exports.sendGreetingMessage = void 0;
 const axios_1 = __importDefault(require("axios"));
 function sendGreetingMessage(userId, channelAccessToken, displayName) {
     return __awaiter(this, void 0, void 0, function* () {
-        const greetingMessage = { type: 'text', text: `สวัสดีคุณ ${displayName}! ขอบคุณที่เป็นเพื่อนกับเรา☺️🎉\n โปรดเพิ่มข้อมูลในระบบได้ที่ลิงค์ด้านล่าง 👇\n https://parcetrace.vercel.app/regis?userId=${userId}` };
+        const greetingMessage = { type: 'text', text: `สวัสดีคุณ ${displayName}! ขอบคุณที่เพิ่มเราเป็นเพื่อน☺️🎉\n\n โปรดเพิ่มข้อมูลของคุณในระบบได้ที่ลิงค์ด้านล่าง 👇\n https://parcetrace.vercel.app/regis?userId=${userId}` };
         const headers = { 'Authorization': `Bearer ${channelAccessToken}`, 'Content-Type': 'application/json' };
         const body = {
             to: userId,
