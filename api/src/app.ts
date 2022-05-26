@@ -84,8 +84,7 @@ app.post('/userreg', (req: Request, res: Response) => {
         res.json({ status: 401, message: "Unauthorized" }).status(401)
         return
     }
-    const body = req.body
-    const data = body.data
+    const data = req.body
     const friendDocRef = db.collection('friends').doc(data.userId)
     fst.checkIfUserIsEligible(friendDocRef, data.userId)
         .then(eligible => {
