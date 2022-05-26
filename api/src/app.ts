@@ -93,6 +93,7 @@ app.post('/userreg', (req: Request, res: Response) => {
     //check for api key
     if (req.token !== process.env.API_KEY) {
         res.json({ status: 401, message: "Unauthorized" }).status(401)
+        console.log('Unauthorized request recieved')
         return
     }
     const data = req.body
@@ -102,6 +103,9 @@ app.post('/userreg', (req: Request, res: Response) => {
             if (eligible) {
                 const userDocRef = db.collection('users').doc(data.userId)
                 fst.dbSetOnUserRegister(userDocRef, data)
+                    .then(() => {
+                        console.log('user registered')
+                    })
                     .catch(err => {
                         console.log(err)
                         res.json({ status: 500, message: "Internal Server Error" }).status(500)
@@ -109,6 +113,7 @@ app.post('/userreg', (req: Request, res: Response) => {
             }
             else {
                 res.json({ status: 403, message: "Forbidden" }).status(403)
+                console.log('Forbidden request recieved')
             }
         })
 })
