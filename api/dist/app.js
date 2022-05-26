@@ -66,7 +66,6 @@ app.use((0, express_bearer_token_1.default)());
 const corsOption = {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    optionSuccessStatus: 200
 };
 //use cors middleware
 app.use((0, cors_1.default)(corsOption));

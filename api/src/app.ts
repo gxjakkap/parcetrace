@@ -47,7 +47,6 @@ app.use(bearerToken())
 const corsOption = {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    optionSuccessStatus: 200
 }
 
 //use cors middleware
