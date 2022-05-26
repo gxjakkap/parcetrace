@@ -91,7 +91,7 @@ app.post('/webhook', (req, res) => {
         }
     }
     console.log('webhook recieved');
-    res.json({}).status(200);
+    res.status(200).json({});
 });
 //unfinished
 //parcel register path
@@ -99,33 +99,49 @@ app.post('/parcelreg', (req, res) => {
     const body = req.body;
 });
 app.post('/userreg', (req, res) => {
+    //TODO: remove console.log
     //check for api key
     if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
         return;
     }
-    const data = req.body;
-    const friendDocRef = db.collection('friends').doc(data.userId);
-    fst.checkIfUserIsEligible(friendDocRef, data.userId)
-        .then(eligible => {
-        if (eligible) {
-            const userDocRef = db.collection('users').doc(data.userId);
-            fst.dbSetOnUserRegister(userDocRef, data)
-                .then(() => {
-                console.log('user registered');
-                res.status(200).json({ status: 200, message: "User registered" });
-            })
-                .catch(err => {
-                console.log(err);
-                res.status(500).json({ status: 500, message: "Internal Server Error" });
-            });
-        }
-        else {
-            res.json({ status: 403, message: "Forbidden" }).status(403);
-            console.log('Forbidden request recieved');
-        }
-    });
+    try { //TODO: make sense of this try catch
+        const data = req.body;
+        const friendDocRef = db.collection('friends').doc(data.userId);
+        fst.checkIfDocumentExist(friendDocRef)
+            .then(eligible => {
+            if (eligible) {
+                const userDocRef = db.collection('users').doc(data.userId);
+                fst.checkIfDocumentExist(userDocRef).then(exist => {
+                    if (exist) {
+                        res.status(409).json({ status: 409, message: "User already exists" });
+                        console.log('User already exists');
+                    }
+                    else {
+                        fst.dbSetOnUserRegister(userDocRef, data)
+                            .then(() => {
+                            console.log('user registered');
+                            res.status(200).json({ status: 200, message: "User registered" });
+                        })
+                            .catch(err => {
+                            console.log(err);
+                            res.status(500).json({ status: 500, message: "Internal Server Error" });
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(403).json({ status: 403, message: "Forbidden" });
+                console.log('Forbidden request recieved');
+            }
+        });
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" });
+        console.log('Bad request recieved');
+        return;
+    }
 });
 https_1.default.createServer(sslCredentials, app)
     .listen(port, () => {

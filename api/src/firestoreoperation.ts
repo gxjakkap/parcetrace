@@ -34,16 +34,9 @@ export const dbSetOnUserRegister = async (ref: FirebaseFirestore.DocumentReferen
     await ref.set(data)
 }
 
-export const checkIfUserIsEligible = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, userId: string) => {
+export const checkIfDocumentExist = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
     const doc = await ref.get()
-    if (doc.exists) {
-        let json = doc.data
-        console.log(Object.keys(json))
-        return true
-    }
-    else {
-        return false
-    }
+    return doc.exists
 }
 
 export default { dbSetOnFollow, dbRemoveOnUnfollow, dbSetOnParcelRegister, dbSetOnUserRegister }

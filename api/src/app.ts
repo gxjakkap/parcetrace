@@ -75,7 +75,7 @@ app.post('/webhook', (req: Request, res: Response) => {
         }
     }
     console.log('webhook recieved')
-    res.json({}).status(200)
+    res.status(200).json({})
 })
 //unfinished
 //parcel register path
@@ -85,6 +85,7 @@ app.post('/parcelreg', (req: Request, res: Response) => {
 })
 
 app.post('/userreg', (req: Request, res: Response) => {
+    //TODO: remove console.log
 
     //check for api key
     if (req.headers.authorization !== process.env.API_KEY) {
@@ -92,27 +93,42 @@ app.post('/userreg', (req: Request, res: Response) => {
         console.log('Unauthorized request recieved')
         return
     }
-    const data = req.body
-    const friendDocRef = db.collection('friends').doc(data.userId)
-    fst.checkIfUserIsEligible(friendDocRef, data.userId)
-        .then(eligible => {
-            if (eligible) {
-                const userDocRef = db.collection('users').doc(data.userId)
-                fst.dbSetOnUserRegister(userDocRef, data)
-                    .then(() => {
-                        console.log('user registered')
-                        res.status(200).json({ status: 200, message: "User registered" })
+    try { //TODO: make sense of this try catch
+        const data = req.body
+        const friendDocRef = db.collection('friends').doc(data.userId)
+        fst.checkIfDocumentExist(friendDocRef)
+            .then(eligible => {
+                if (eligible) {
+                    const userDocRef = db.collection('users').doc(data.userId)
+                    fst.checkIfDocumentExist(userDocRef).then(exist => {
+                        if (exist) {
+                            res.status(409).json({ status: 409, message: "User already exists" })
+                            console.log('User already exists')
+                        }
+                        else {
+                            fst.dbSetOnUserRegister(userDocRef, data)
+                                .then(() => {
+                                    console.log('user registered')
+                                    res.status(200).json({ status: 200, message: "User registered" })
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                    res.status(500).json({ status: 500, message: "Internal Server Error" })
+                                })
+                        }
                     })
-                    .catch(err => {
-                        console.log(err)
-                        res.status(500).json({ status: 500, message: "Internal Server Error" })
-                    })
-            }
-            else {
-                res.json({ status: 403, message: "Forbidden" }).status(403)
-                console.log('Forbidden request recieved')
-            }
-        })
+                }
+                else {
+                    res.status(403).json({ status: 403, message: "Forbidden" })
+                    console.log('Forbidden request recieved')
+                }
+            })
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        return
+    }
 })
 
 https.createServer(sslCredentials, app)
