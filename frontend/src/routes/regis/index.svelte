@@ -53,6 +53,12 @@
                 Authorization: "Bearer ".concat(API_KEY),
             },
             body: JSON.stringify(userData),
+        }).then((res) => {
+            if (res.status === 200) {
+                location.replace("/regis/success");
+            } else {
+                alert("ลงทะเบียนไม่สำเร็จ");
+            }
         });
     }
 </script>
