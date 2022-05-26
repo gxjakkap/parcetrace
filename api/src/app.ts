@@ -93,6 +93,8 @@ app.post('/userreg', (req: Request, res: Response) => {
     if (req.token !== process.env.API_KEY) {
         res.json({ status: 401, message: "Unauthorized" }).status(401)
         console.log('Unauthorized request recieved')
+        console.log(req.token)
+        console.log(process.env.API_KEY)
         return
     }
     const data = req.body
