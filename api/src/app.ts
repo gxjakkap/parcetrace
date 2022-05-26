@@ -88,12 +88,8 @@ app.post('/userreg', (req: Request, res: Response) => {
 
     //check for api key
     if (req.headers.authorization !== process.env.API_KEY) {
-        res.json({ status: 401, message: "Unauthorized" }).status(401)
+        res.status(401).json({ status: 401, message: "Unauthorized" })
         console.log('Unauthorized request recieved')
-        console.log(req.headers.authorization)
-        console.log(process.env.API_KEY)
-        console.log(req.body)
-        console.log(req.headers)
         return
     }
     const data = req.body
@@ -105,10 +101,11 @@ app.post('/userreg', (req: Request, res: Response) => {
                 fst.dbSetOnUserRegister(userDocRef, data)
                     .then(() => {
                         console.log('user registered')
+                        res.status(200).json({ status: 200, message: "User registered" })
                     })
                     .catch(err => {
                         console.log(err)
-                        res.json({ status: 500, message: "Internal Server Error" }).status(500)
+                        res.status(500).json({ status: 500, message: "Internal Server Error" })
                     })
             }
             else {
