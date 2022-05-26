@@ -88,24 +88,35 @@ app.post('/webhook', (req, res) => {
     console.log('webhook recieved');
     res.json({}).status(200);
 });
-/* unfinished
+//unfinished
 //parcel register path
-app.post('/parcelreg', (req: Request, res: Response) => {
-    const body = req.body
-
-})
-
-app.post('/userreg', (req: Request, res: Response) => {
-
+app.post('/parcelreg', (req, res) => {
+    const body = req.body;
+});
+app.post('/userreg', (req, res) => {
     //check for api key
     if (req.token !== process.env.API_KEY) {
-        res.json({ status: 401, message: "Unauthorized" }).status(401)
-        return
+        res.json({ status: 401, message: "Unauthorized" }).status(401);
+        return;
     }
-    const body = req.body
-
-})
- */
+    const body = req.body;
+    const data = body.data;
+    const friendDocRef = db.collection('friends').doc(data.userId);
+    fst.checkIfUserIsEligible(friendDocRef, data.userId)
+        .then(eligible => {
+        if (eligible) {
+            const userDocRef = db.collection('users').doc(data.userId);
+            fst.dbSetOnUserRegister(userDocRef, data)
+                .catch(err => {
+                console.log(err);
+                res.json({ status: 500, message: "Internal Server Error" }).status(500);
+            });
+        }
+        else {
+            res.json({ status: 403, message: "Forbidden" }).status(403);
+        }
+    });
+});
 https_1.default.createServer(sslCredentials, app)
     .listen(port, () => {
     console.log(`App listening on port ${port}`);
