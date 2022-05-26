@@ -44,22 +44,35 @@
             alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
             return;
         }
-        await fetch("https://api.guntxjakka.me/userreg", {
+        fetch("https://api.guntxjakka.me/userreg", {
             method: "POST",
-            mode: "cors",
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: "Bearer ".concat(API_KEY),
+                authorization: API_KEY,
             },
             body: JSON.stringify(userData),
-        }).then((res) => {
-            if (res.status === 200) {
-                location.replace("/regis/success");
-            } else {
-                alert("ลงทะเบียนไม่สำเร็จ");
-            }
-        });
+        })
+            .then((res) => {
+                //TODO: remove console.log
+                if (res.status === 200) {
+                    location.replace("/regis/success");
+                } else if (res.status === 409) {
+                    console.log(res);
+                    alert("คุณได้ลงทะเบียนไปแล้ว");
+                } else if (res.status === 500) {
+                    console.log(res);
+                    alert(
+                        "เกิดข้อผิดพลาดขึ้นกับเซิร์ฟเวอร์ลงทะเบียน โปรดลองใหม่อีกครั้ง"
+                    ); //TODO: show error modal instead of alert
+                } else {
+                    console.log(res);
+                    alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 </script>
 
