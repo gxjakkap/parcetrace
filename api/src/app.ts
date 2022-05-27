@@ -101,42 +101,46 @@ app.post('/userreg', (req: Request, res: Response) => {
         console.log('Unauthorized request recieved')
         return
     }
-    try { //TODO: make sense of this try catch
-        const data = req.body
-        const friendDocRef = db.collection('friends').doc(data.userId)
-        fst.checkIfDocumentExist(friendDocRef)
-            .then(eligible => {
-                if (eligible) {
-                    const userDocRef = db.collection('users').doc(data.userId)
-                    fst.checkIfDocumentExist(userDocRef).then(exist => {
-                        if (exist) {
-                            res.status(409).json({ status: 409, message: "User already exists" })
-                            console.log('User already exists')
-                        }
-                        else {
-                            fst.dbSetOnUserRegister(userDocRef, data)
-                                .then(() => {
-                                    console.log('user registered')
-                                    res.status(200).json({ status: 200, message: "User registered" })
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                    res.status(500).json({ status: 500, message: "Internal Server Error" })
-                                })
-                        }
-                    })
-                }
-                else {
-                    res.status(403).json({ status: 403, message: "Forbidden" })
-                    console.log('Forbidden request recieved')
-                }
-            })
+    let data: any
+    try {
+        data = req.body
+        if (data.userId === undefined || data.displayName === undefined || data.picLink === undefined) {
+            throw new Error('Invalid data')
+        }
     }
     catch (err) {
         res.status(400).json({ status: 400, message: "Bad Request" })
         console.log('Bad request recieved')
         return
     }
+    const friendDocRef = db.collection('friends').doc(data.userId)
+    fst.checkIfDocumentExist(friendDocRef)
+        .then(eligible => {
+            if (eligible) {
+                const userDocRef = db.collection('users').doc(data.userId)
+                fst.checkIfDocumentExist(userDocRef).then(exist => {
+                    if (exist) {
+                        res.status(409).json({ status: 409, message: "User already exists" })
+                        console.log('User already exists')
+                    }
+                    else {
+                        fst.dbSetOnUserRegister(userDocRef, data)
+                            .then(() => {
+                                console.log('user registered')
+                                res.status(200).json({ status: 200, message: "User registered" })
+                            })
+                            .catch(err => {
+                                console.log(err)
+                                res.status(500).json({ status: 500, message: "Internal Server Error" })
+                            })
+                    }
+                })
+            }
+            else {
+                res.status(403).json({ status: 403, message: "Forbidden" })
+                console.log('Forbidden request recieved')
+            }
+        })
 })
 
 https.createServer(sslCredentials, app)
