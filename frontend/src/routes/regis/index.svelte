@@ -159,9 +159,17 @@
                 <div
                     class="bg-white px-6 py-8 rounded shadow-md text-black w-full"
                 >
-                    <h1 class="mb-8 text-3xl text-center">
+                    <h1 class="font-Prompt mb-8 text-3xl text-center">
                         Error: userId is missing or invalid.
                     </h1>
+                    <br />
+                    <p class="text-center">
+                        Click <a
+                            href="/"
+                            class="text-blue-700 underline hover:text-sky-500"
+                            >here</a
+                        > to go back home.
+                    </p>
                 </div>
             </div>
         </div>
