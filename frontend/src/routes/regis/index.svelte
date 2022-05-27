@@ -1,13 +1,18 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { API_KEY } from "$lib/env";
+    import { API_KEY, API_URL } from "$lib/env";
 
+    //define variable for fetching data
     let apikey: string = "";
+    let apiUrl: string = "";
 
+    //check for environment and set api key and url
     if (process.env.NODE_ENV === "production") {
         apikey = process.env.API_KEY as string;
+        apiUrl = process.env.API_URL as string;
     } else {
         apikey = API_KEY;
+        apiUrl = API_URL;
     }
 
     //get userId params from url (https://domain.ext/reqis?userId="userId")
@@ -52,7 +57,7 @@
             alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
             return;
         }
-        fetch("https://api.guntxjakka.me/userreg", {
+        fetch(`https://${apiUrl}/userreg`, {
             method: "POST",
             cache: "no-cache",
             headers: {
