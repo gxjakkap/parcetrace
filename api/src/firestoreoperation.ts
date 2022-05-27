@@ -22,8 +22,16 @@ export const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<Fir
     await ref.set(data)
 }
 
-export const dbRemoveOnUnfollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+export const dbRemoveDoc = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
     await ref.delete()
+}
+
+export const dbRemoveOnUnfollow = async (friendDocRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, userDocRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+    await friendDocRef.delete()
+    const userDoc = await userDocRef.get()
+    if (userDoc.exists) {
+        await userDocRef.delete()
+    }
 }
 
 export const dbSetOnParcelRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: parcel) => {
@@ -39,5 +47,5 @@ export const checkIfDocumentExist = async (ref: FirebaseFirestore.DocumentRefere
     return doc.exists
 }
 
-export default { dbSetOnFollow, dbRemoveOnUnfollow, dbSetOnParcelRegister, dbSetOnUserRegister }
+export default { dbSetOnFollow, dbRemoveOnUnfollow: dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister }
 export type { friends, parcel, userData }

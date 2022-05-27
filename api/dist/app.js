@@ -50,10 +50,7 @@ const db = (0, firestore_1.getFirestore)();
 const sslPrivkey = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem");
 const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem");
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate };
-/* //init line client from line sdk
-const lineClient = new line.Client({
-    channelAccessToken: process.env.CAT as string
-}) */
+//get line credentials
 const channelAccessToken = process.env.CAT;
 //init express app
 const app = (0, express_1.default)();
@@ -71,6 +68,11 @@ app.post('/webhook', (req, res) => {
     const body = req.body;
     if (body.events) {
         for (let i = 0; i < body.events.length; i++) {
+            /*
+            *   Follow event
+            *   - add user to friends collection
+            *   - send greeting message
+            */
             if (body.events[i].type === 'follow') {
                 console.log(body.events[i].source.userId);
                 axios_1.default.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`, {
@@ -84,9 +86,15 @@ app.post('/webhook', (req, res) => {
                     fst.dbSetOnFollow(docRef, { userId: data.data.userId, displayName: data.data.displayName, picLink: data.data.pictureUrl }).catch(err => { console.log(err); });
                 });
             }
+            /*
+            *   Unfollow event
+            *   - remove user from friends collection
+            *   - remove user from user collection
+            */
             else if (body.events[i].type === 'unfollow') {
-                const docRef = db.collection('friends').doc(body.events[i].source.userId);
-                fst.dbRemoveOnUnfollow(docRef);
+                const friendDocRef = db.collection('friends').doc(body.events[i].source.userId);
+                const userDocRef = db.collection('users').doc(body.events[i].source.userId);
+                fst.dbRemoveOnUnfollow(friendDocRef, userDocRef).catch(err => { console.log(err); });
             }
         }
     }

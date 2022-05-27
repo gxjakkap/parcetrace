@@ -9,13 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbSetOnFollow = void 0;
+exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
 const dbSetOnFollow = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.set(data);
 });
 exports.dbSetOnFollow = dbSetOnFollow;
-const dbRemoveOnUnfollow = (ref) => __awaiter(void 0, void 0, void 0, function* () {
+const dbRemoveDoc = (ref) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.delete();
+});
+exports.dbRemoveDoc = dbRemoveDoc;
+const dbRemoveOnUnfollow = (friendDocRef, userDocRef) => __awaiter(void 0, void 0, void 0, function* () {
+    yield friendDocRef.delete();
+    const userDoc = yield userDocRef.get();
+    if (userDoc.exists) {
+        yield userDocRef.delete();
+    }
 });
 exports.dbRemoveOnUnfollow = dbRemoveOnUnfollow;
 const dbSetOnParcelRegister = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
@@ -31,4 +39,4 @@ const checkIfDocumentExist = (ref) => __awaiter(void 0, void 0, void 0, function
     return doc.exists;
 });
 exports.checkIfDocumentExist = checkIfDocumentExist;
-exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveOnUnfollow, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister };
+exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveDoc, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister };
