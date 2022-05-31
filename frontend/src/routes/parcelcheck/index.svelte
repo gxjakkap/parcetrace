@@ -3,6 +3,25 @@
 
     //get userId params from url (https://domain.ext/parcecheck?userId="userId")
     let userId: string | null = $page.url.searchParams.get("userId") || null;
+
+    //fake data for test
+    let data = [
+        {date: 1653831551000, carrier: "Kerry", status: "available"},
+        {date: 1653853361000, carrier: "ThaiPost", status: "available"},
+        {date: 1649952755000, carrier: "LEX TH", status: "lost"},
+    ]
+
+    const localeDateString = (date: number) => {
+        let epdate = new Date(date)
+        return epdate.toLocaleDateString('th-TH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            weekday: 'long'
+        })
+    }
 </script>
 
 <svelte:head>
@@ -10,7 +29,8 @@
 </svelte:head>
 
 <main>
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <h1 class="font-Prompt text-black dark:text-white text-center text-4xl px-3 mb-5 mt-5">พัสดุของคุณ</h1>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3">
         <table
             class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
         >
@@ -18,46 +38,30 @@
                 class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
             >
                 <tr>
-                    <th scope="col" class="px-6 py-3"> วันที่ </th>
-                    <th scope="col" class="px-6 py-3"> พัสดุจาก </th>
-                    <th scope="col" class="px-6 py-3"> สถานะ </th>
+                    <th scope="col" class="font-Prompt px-6 py-3"> วันที่ </th>
+                    <th scope="col" class="font-Prompt px-6 py-3"> พัสดุจาก </th>
+                    <th scope="col" class="font-Prompt px-6 py-3"> สถานะ </th>
                 </tr>
             </thead>
             <tbody>
+                {#each data as d}
                 <tr
-                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+            >
+                <th
+                    scope="row"
+                    class="font-Prompt px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
                 >
-                    <th
-                        scope="row"
-                        class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
-                    >
-                        Apple MacBook Pro 17"
-                    </th>
-                    <td class="px-6 py-4"> Sliver </td>
-                    <td class="px-6 py-4"> Laptop </td>
-                </tr>
-                <tr
-                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                >
-                    <th
-                        scope="row"
-                        class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
-                    >
-                        Microsoft Surface Pro
-                    </th>
-                    <td class="px-6 py-4"> White </td>
-                    <td class="px-6 py-4"> Laptop PC </td>
-                </tr>
-                <tr class="bg-white dark:bg-gray-800">
-                    <th
-                        scope="row"
-                        class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
-                    >
-                        Magic Mouse 2
-                    </th>
-                    <td class="px-6 py-4"> Black </td>
-                    <td class="px-6 py-4"> Accessories </td>
-                </tr>
+                    {localeDateString(d.date)}
+                </th>
+                <td class="font-Prompt text-gray-900 dark:text-white px-6 py-4"> {d.carrier} </td>
+                {#if d.status === 'available'}
+                    <td class="font-Prompt text-green-500 px-6 py-4"> อยู่ที่นิติบุคคล </td>
+                    {:else}
+                        <td class="font-Prompt text-red-500 px-6 py-4"> สูญหาย </td>
+                {/if}
+            </tr>
+                {/each}
             </tbody>
         </table>
     </div>
