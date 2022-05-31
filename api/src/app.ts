@@ -9,6 +9,7 @@ import cors from 'cors'
 import bearerToken from 'express-bearer-token'
 import { sendGreetingMessage } from './greetings'
 import * as fst from './firestoreoperation'
+import * as msg from './message'
 
 //set port
 const port = process.env.port || 3000
@@ -127,6 +128,13 @@ app.post('/userreg', (req: Request, res: Response) => {
                         fst.dbSetOnUserRegister(userDocRef, data)
                             .then(() => {
                                 console.log('user registered')
+                                msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
+                                    .then(() => {
+                                        console.log('user notified about a successful registration')
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
                                 res.status(200).json({ status: 200, message: "User registered" })
                             })
                             .catch(err => {

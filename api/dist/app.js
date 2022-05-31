@@ -36,6 +36,7 @@ const axios_1 = __importDefault(require("axios"));
 const cors_1 = __importDefault(require("cors"));
 const greetings_1 = require("./greetings");
 const fst = __importStar(require("./firestoreoperation"));
+const msg = __importStar(require("./message"));
 //set port
 const port = process.env.port || 3000;
 //get credentials path
@@ -140,6 +141,13 @@ app.post('/userreg', (req, res) => {
                     fst.dbSetOnUserRegister(userDocRef, data)
                         .then(() => {
                         console.log('user registered');
+                        msg.sendRegistrationConfirmMessage(data.userId, channelAccessToken, data)
+                            .then(() => {
+                            console.log('user notified about a successful registration');
+                        })
+                            .catch(err => {
+                            console.log(err);
+                        });
                         res.status(200).json({ status: 200, message: "User registered" });
                     })
                         .catch(err => {
