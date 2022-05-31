@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-    import Device from "svelte-device-info";
-</script>
-
 <script lang="ts">
     import { page } from "$app/stores";
 
@@ -24,24 +20,6 @@
     // get date string from epoch
     const localeDateString = (date: any) => {
         let epdate = new Date(date);
-        /**if (Device.isMobile || Device.isPhone) {
-            return epdate.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-            });
-        } else {
-            return epdate.toLocaleDateString("th-TH", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                weekday: "long",
-            });
-        }**/
         return epdate.toLocaleDateString("th-TH", {
             year: "numeric",
             month: "short",
