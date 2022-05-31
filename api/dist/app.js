@@ -125,6 +125,7 @@ app.post('/userreg', (req, res) => {
     catch (err) {
         res.status(400).json({ status: 400, message: "Bad Request" });
         console.log('Bad request recieved');
+        console.log(err);
         return;
     }
     const friendDocRef = db.collection('friends').doc(data.userId);
