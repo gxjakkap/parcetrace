@@ -78,6 +78,8 @@
                     alert(
                         "เกิดข้อผิดพลาดขึ้นกับเซิร์ฟเวอร์ลงทะเบียน โปรดลองใหม่อีกครั้ง"
                     ); //TODO: show error modal instead of alert
+                } else if (res.status === 403) {
+                    alert("คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!");
                 } else {
                     console.log(res);
                     alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
