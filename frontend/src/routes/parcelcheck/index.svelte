@@ -4,13 +4,14 @@
     //get userId params from url (https://domain.ext/parcecheck?userId="userId")
     let userId: string | null = $page.url.searchParams.get("userId") || null;
 
-    //fake data for test
+    //mock data for test
     let data = [
         {date: 1653831551000, carrier: "Kerry", status: "available"},
         {date: 1653853361000, carrier: "ThaiPost", status: "available"},
         {date: 1649952755000, carrier: "LEX TH", status: "lost"},
     ]
 
+    // get date string from epoch
     const localeDateString = (date: number) => {
         let epdate = new Date(date)
         return epdate.toLocaleDateString('th-TH', {
