@@ -105,7 +105,7 @@ app.post('/userreg', (req: Request, res: Response) => {
     let data: any
     try {
         data = req.body
-        if (data.userId === undefined || data.displayName === undefined || data.picLink === undefined) {
+        if (!data.userId || !data.name || !data.surname || !data.phoneNumber || !data.room) {
             throw new Error('Invalid data')
         }
     }
