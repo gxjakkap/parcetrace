@@ -1,110 +1,60 @@
 <script lang="ts">
-    import { page } from "$app/stores";
-
-    interface data {
-        date?: number;
-        carrier?: string;
-        status?: "available" | "lost";
+    import { API_KEY, API_URL } from "$lib/env";
+    let apikey: string;
+    let apiUrl: string;
+    //check for environment and set api key and url
+    if (process.env.NODE_ENV === "production") {
+        apikey = process.env.API_KEY as string;
+        apiUrl = process.env.API_URL as string;
+    } else {
+        apikey = API_KEY;
+        apiUrl = API_URL;
     }
 
-    //get userId params from url (https://domain.ext/parcecheck?userId="userId")
-    let userId: string | null = $page.url.searchParams.get("userId") || null;
+    let phoneNumber: number | null;
 
-    //mock data for test
-    let data: data[] = [
-        { date: 1653831551000, carrier: "Kerry", status: "available" },
-        { date: 1653853361000, carrier: "ThaiPost", status: "available" },
-        { date: 1649952755000, carrier: "LEX TH", status: "lost" },
-    ];
-
-    // get date string from epoch
-    const localeDateString = (date: any) => {
-        let epdate = new Date(date);
-        return epdate.toLocaleDateString("th-TH", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
+    async function onSubmit() {
+        fetch(`https://${apiUrl}/getUserId`, {
+            method: "POST",
+            cache: "no-cache",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: apikey,
+            },
+            body: JSON.stringify({ phoneNumber: phoneNumber }),
+        }).then((res) => {
+            if (res.status === 200) {
+                location.replace("/parcelcheck/res?q=".concat("userId"));
+            } else {
+                console.log(res);
+                alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
+            }
         });
-    };
+    }
 </script>
 
-<svelte:head>
-    <title>Parcel Check - Parcetrace</title>
-</svelte:head>
-
 <main>
-    <h1
-        class="font-Prompt text-black dark:text-white text-center text-4xl px-3 mb-5 mt-5"
-    >
-        พัสดุของคุณ
-    </h1>
-    {#if data.length >= 1}
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3">
-            <table
-                class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
-            >
-                <thead
-                    class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-                >
-                    <tr>
-                        <th scope="col" class="font-Prompt px-6 py-3">
-                            วันที่
-                        </th>
-                        <th scope="col" class="font-Prompt px-6 py-3">
-                            พัสดุจาก
-                        </th>
-                        <th scope="col" class="font-Prompt px-6 py-3">
-                            สถานะ
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each data as d}
-                        <tr
-                            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                        >
-                            <th
-                                scope="row"
-                                class="font-Prompt px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
-                            >
-                                {localeDateString(d.date)}
-                            </th>
-                            <td
-                                class="font-Prompt text-gray-900 dark:text-white px-6 py-4"
-                            >
-                                {d.carrier}
-                            </td>
-                            {#if d.status === "available"}
-                                <td
-                                    class="font-Prompt text-green-500 px-6 py-4"
-                                >
-                                    อยู่ที่นิติบุคคล
-                                </td>
-                            {:else}
-                                <td class="font-Prompt text-red-500 px-6 py-4">
-                                    สูญหาย
-                                </td>
-                            {/if}
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
-    {:else}
+    <div class="bg-gray-200 min-h-screen flex flex-col">
         <div
-            class="drop-shadow-lg container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
+            class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
         >
-            <div
-                class="bg-slate-200 dark:bg-slate-900 px-6 py-8 rounded shadow-md text-black w-full"
-            >
-                <h1
-                    class="font-Prompt text-black dark:text-white mb-8 mt-8 text-3xl text-center"
-                >
-                    คุณไม่มีพัสดุในระบบ
+            <div class="bg-white px-6 py-8 rounded shadow-md text-black w-full">
+                <h1 class="font-Prompt mb-8 text-3xl text-center">
+                    ตรวจสอบพัสดุ
                 </h1>
+                <input
+                    type="tel"
+                    class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
+                    placeholder="เบอร์โทรศัพท์"
+                    bind:value={phoneNumber}
+                />
+
+                <button
+                    type="submit"
+                    class="font-Prompt w-full text-center py-3 rounded bg-green-500 text-white hover:bg-green-700 focus:outline-none my-1"
+                    on:click={onSubmit}>ค้นหา</button
+                >
             </div>
         </div>
-    {/if}
+    </div>
 </main>
