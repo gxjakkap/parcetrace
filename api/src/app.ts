@@ -152,6 +152,80 @@ app.post('/userreg', (req: Request, res: Response) => {
         })
 })
 
+//get user id
+app.get('/getUserId', (req: Request, res: Response) => {
+    if (req.headers.authorization !== process.env.API_KEY) {
+        res.status(401).json({ status: 401, message: "Unauthorized" })
+        console.log('Unauthorized request recieved')
+        return
+    }
+    let data: any
+    try {
+        data = req.body
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        console.log(err)
+        return
+    }
+    const collectionRef = db.collection('users')
+    fst.findUserWithPhoneNumber(collectionRef, data.phoneNumber)
+        .then(response => {
+            if (response.successful) {
+                if (response.statusCode === 200) {
+                    res.status(200).json({ status: 200, userId: response.userId })
+                }
+                else {
+                    res.status(500).json({ status: 500, message: "Internal Server Error" })
+                }
+            }
+            else {
+                res.status(response.statusCode).json({ status: response.statusCode, message: response.errorMessage })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, message: "Internal Server Error" })
+        })
+})
+
+app.get('/parcelcheck', (req: Request, res: Response) => {
+    //check for api key
+    if (req.headers.authorization !== process.env.API_KEY) {
+        res.status(401).json({ status: 401, message: "Unauthorized" })
+        console.log('Unauthorized request recieved')
+        return
+    }
+
+    let data: any
+    try {
+        data = req.body
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        console.log(err)
+        return
+    }
+    const docRef = db.collection('users').doc(data.userId)
+    fst.getUserActiveParcels(docRef)
+        .then(activeParcels => {
+            if (activeParcels.length > 0) {
+                console.log('active parcels found')
+                res.status(200).json({ status: 200, parcels: activeParcels })
+            }
+            else {
+                console.log('no active parcels found')
+                res.status(200).json({ status: 200, parcels: [] })
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, message: "Internal Server Error" })
+        })
+})
+
 https.createServer(sslCredentials, app)
     .listen(port, () => {
         console.log(`App listening on port ${port}`)
