@@ -6,8 +6,6 @@ import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
 import cors from 'cors'
-import bearerToken from 'express-bearer-token'
-import { sendGreetingMessage } from './greetings'
 import * as fst from './firestoreoperation'
 import * as msg from './message'
 
@@ -66,7 +64,7 @@ app.post('/webhook', (req: Request, res: Response) => {
                     }
                 })
                     .then(data => {
-                        sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
+                        msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
                         const docRef = db.collection('friends').doc(body.events[i].source.userId as string)
                         fst.dbSetOnFollow(docRef, { userId: data.data.userId, displayName: data.data.displayName, picLink: data.data.pictureUrl }).catch(err => { console.log(err) })
                     })

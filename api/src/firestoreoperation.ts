@@ -5,9 +5,10 @@ interface friends {
 }
 
 interface parcel {
+    date: Date,
+    carrier: string,
+    status: 'available' | 'lost',
     parcelId: string,
-    ownerId: string,
-    status: 'available' | 'lost'
 }
 
 interface userData {
@@ -42,7 +43,12 @@ export const dbRemoveOnUnfollow = async (friendDocRef: FirebaseFirestore.Documen
 }
 
 export const dbSetOnParcelRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: parcel) => {
-    await ref.set(data)
+    let userData = await ref.get()
+    if (userData.exists) {
+        let activeParcels = userData.data()?.activeParcels as parcel[] || []
+        activeParcels.push(data)
+        await ref.set(userData)
+    }
 }
 
 export const dbSetOnUserRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: userData) => {
@@ -92,5 +98,5 @@ export const getUserActiveParcels = async (ref: FirebaseFirestore.DocumentRefere
     }
 }
 
-export default { dbSetOnFollow, dbRemoveOnUnfollow: dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister }
+export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister }
 export type { friends, parcel, userData }
