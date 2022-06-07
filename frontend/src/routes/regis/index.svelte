@@ -2,18 +2,11 @@
     import { page } from "$app/stores";
     import { API_KEY, API_URL } from "$lib/env";
 
-    //define variable for fetching data
-    let apikey: string = "";
-    let apiUrl: string = "";
-
     //check for environment and set api key and url
-    if (process.env.NODE_ENV === "production") {
-        apikey = process.env.API_KEY as string;
-        apiUrl = process.env.API_URL as string;
-    } else {
-        apikey = API_KEY;
-        apiUrl = API_URL;
-    }
+    const apikey =
+        process.env.NODE_ENV === "production" ? process.env.API_KEY : API_KEY;
+    const apiUrl =
+        process.env.NODE_ENV === "production" ? process.env.API_URL : API_URL;
 
     //get userId params from url (https://domain.ext/reqis?userId="userId")
     let userId: string | null = $page.url.searchParams.get("userId") || null;
@@ -62,7 +55,7 @@
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json",
-                authorization: apikey,
+                authorization: apikey as string,
             },
             body: JSON.stringify(userData),
         })
