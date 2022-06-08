@@ -170,7 +170,7 @@ app.get('/getUserId', (req, res) => {
         console.log('Unauthorized request recieved');
         return;
     }
-    const phoneNumber = parseInt(req.query.phoneNo);
+    const phoneNumber = req.query.phoneNo;
     const collectionRef = db.collection('users');
     fst.findUserWithPhoneNumber(collectionRef, phoneNumber)
         .then(response => {
