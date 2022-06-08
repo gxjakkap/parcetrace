@@ -4,11 +4,19 @@ interface friends {
     picLink: string
 }
 
-interface parcel {
+interface userParcel {
     date: Date,
     carrier: string,
     status: 'available' | 'lost' | 'found',
     parcelId: string,
+}
+
+interface allParcel {
+    date: Date,
+    carrier: string,
+    status: 'available' | 'lost' | 'found',
+    parcelId: string,
+    userId: string,
 }
 
 interface userData {
@@ -42,12 +50,22 @@ export const dbRemoveOnUnfollow = async (friendDocRef: FirebaseFirestore.Documen
     }
 }
 
-export const dbSetOnParcelRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: parcel) => {
-    let userData = await ref.get()
+export const dbSetOnParcelRegister = async (userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, userParcelData: userParcel, allActiveRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, parcelData: allParcel) => {
+    let userData = await userRef.get()
     if (userData.exists) {
-        let activeParcels = userData.data()?.activeParcel as parcel[] || []
-        activeParcels.push(data)
-        await ref.set(userData)
+        let activeParcels = userData.data()?.activeParcel as userParcel[] || []
+        activeParcels.push(userParcelData)
+        await userRef.set(userData, { merge: true })
+    }
+    await allActiveRef.set(parcelData)
+}
+
+export const dbRemoveParcelFromUserData = async (userRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, parcelId: string) => {
+    let userData = await userRef.get()
+    if (userData.exists) {
+        let activeParcels = userData.data()?.activeParcel as userParcel[] || []
+        activeParcels = activeParcels.filter(parcel => parcel.parcelId !== parcelId)
+        await userRef.set(userData)
     }
 }
 
@@ -103,4 +121,4 @@ export const getUserActiveParcels = async (ref: FirebaseFirestore.DocumentRefere
 }
 
 export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister }
-export type { friends, parcel, userData }
+export type { friends, userParcel, allParcel, userData }

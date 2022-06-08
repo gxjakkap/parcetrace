@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserActiveParcels = exports.findUserWithPhoneNumber = exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
+exports.getUserActiveParcels = exports.findUserWithPhoneNumber = exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbRemoveParcelFromUserData = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
 const dbSetOnFollow = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.set(data);
 });
@@ -26,16 +26,27 @@ const dbRemoveOnUnfollow = (friendDocRef, userDocRef) => __awaiter(void 0, void 
     }
 });
 exports.dbRemoveOnUnfollow = dbRemoveOnUnfollow;
-const dbSetOnParcelRegister = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
+const dbSetOnParcelRegister = (userRef, userParcelData, allActiveRef, parcelData) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    let userData = yield ref.get();
+    let userData = yield userRef.get();
     if (userData.exists) {
         let activeParcels = ((_a = userData.data()) === null || _a === void 0 ? void 0 : _a.activeParcel) || [];
-        activeParcels.push(data);
-        yield ref.set(userData);
+        activeParcels.push(userParcelData);
+        yield userRef.set(userData, { merge: true });
     }
+    yield allActiveRef.set(parcelData);
 });
 exports.dbSetOnParcelRegister = dbSetOnParcelRegister;
+const dbRemoveParcelFromUserData = (userRef, parcelId) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    let userData = yield userRef.get();
+    if (userData.exists) {
+        let activeParcels = ((_b = userData.data()) === null || _b === void 0 ? void 0 : _b.activeParcel) || [];
+        activeParcels = activeParcels.filter(parcel => parcel.parcelId !== parcelId);
+        yield userRef.set(userData);
+    }
+});
+exports.dbRemoveParcelFromUserData = dbRemoveParcelFromUserData;
 const dbSetOnUserRegister = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.set(data);
 });
@@ -78,10 +89,10 @@ const findUserWithPhoneNumber = (collection, phoneNumber) => __awaiter(void 0, v
 });
 exports.findUserWithPhoneNumber = findUserWithPhoneNumber;
 const getUserActiveParcels = (ref) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+    var _c;
     const doc = yield ref.get();
     if (doc.exists) {
-        return (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.activeParcel;
+        return (_c = doc.data()) === null || _c === void 0 ? void 0 : _c.activeParcel;
     }
     else {
         return [];

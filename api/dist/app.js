@@ -34,6 +34,7 @@ const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
 const cors_1 = __importDefault(require("cors"));
+const crypto_1 = __importDefault(require("crypto"));
 const fst = __importStar(require("./firestoreoperation"));
 const msg = __importStar(require("./message"));
 //set port
@@ -105,6 +106,17 @@ app.post('/webhook', (req, res) => {
 //parcel register path
 app.post('/parcelreg', (req, res) => {
     const body = req.body;
+    let randomUUID = crypto_1.default.randomUUID();
+    const dataForUser = { status: body.status, date: new Date, carrier: body.carrier, parcelId: crypto_1.default.randomUUID() };
+    const dataForAllActive = { status: body.status, date: new Date, carrier: body.carrier, parcelId: crypto_1.default.randomUUID(), userId: body.userId };
+    const userRef = db.collection('users').doc(body.userId);
+    const allActiveRef = db.collection('allActiveParcel').doc(randomUUID);
+    fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
+        .then(() => {
+        msg.sendParcelNotificationMessage(body.userId, channelAccessToken, dataForUser);
+        res.status(200).json({ status: 200, message: 'Parcel registered' });
+    })
+        .catch(err => { console.log(err); res.status(500).json({ status: 500, message: 'Internal Server Error' }); return; });
 });
 app.post('/userreg', (req, res) => {
     //TODO: remove console.log
@@ -224,6 +236,7 @@ app.delete('/parcel', (req, res) => {
         console.log('Unauthorized request recieved');
         return;
     }
+    //check for data
     let data;
     try {
         data = req.body;
@@ -234,16 +247,19 @@ app.delete('/parcel', (req, res) => {
         console.log(err);
         return;
     }
+    //get user data reference
     const docRef = db.collection('users').doc(data.userId);
+    //get user active parcels reference
     fst.getUserActiveParcels(docRef)
         .then(activeParcels => {
         if (activeParcels.length > 0) {
-            console.log('active parcels found');
-            res.status(200).json({ status: 200, parcels: activeParcels });
+            fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId));
+            fst.dbRemoveParcelFromUserData(docRef, data.parcelId);
+            res.status(200).json({ status: 200, message: "Parcel deleted" });
         }
         else {
             console.log('no active parcels found');
-            res.status(200).json({ status: 200, parcels: [] });
+            res.status(404).json({ status: 404, message: "No active parcels found" });
         }
     })
         .catch(err => {

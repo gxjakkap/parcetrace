@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { TextMessage } from '@line/bot-sdk'
-import { userData, parcel } from './firestoreoperation'
+import { userData, userParcel } from './firestoreoperation'
 
 const baseUrl = 'https://parcetrace.vercel.app/'
 
@@ -23,7 +23,7 @@ export async function sendGreetingMessage(userId: string, channelAccessToken: st
     return sendMessage(greetingMessage, channelAccessToken, userId)
 }
 
-export async function sendParcelNotificationMessage(userId: string, channelAccessToken: string, parcelData: parcel) {
+export async function sendParcelNotificationMessage(userId: string, channelAccessToken: string, parcelData: userParcel) {
     const message: TextMessage = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุจาก ${parcelData.carrier} มาส่งค้าบ\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?parcelId=${parcelData.parcelId}` }
     return sendMessage(message, channelAccessToken, userId)
 }
