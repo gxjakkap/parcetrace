@@ -15,10 +15,15 @@
         apiUrl = API_URL;
     }
 
-    interface data {
+    interface parcels {
         date?: number;
         carrier?: string;
-        status?: "available" | "lost";
+        status?: "available" | "lost" | "found";
+    }
+
+    interface responsedata {
+        status: number;
+        parcels: parcels[];
     }
 
     //get userId params from url (https://domain.ext/parcecheck?userId="userId")
@@ -31,8 +36,6 @@
         { date: 1649952755000, carrier: "LEX TH", status: "lost" },
     ]; */
 
-    let data: data[] = [];
-
     //validate userId with regex. if input doesn't match, make it null to display error
     if (userId && !/U[0-9a-f]{32}/.test(userId)) {
         userId = null;
@@ -40,17 +43,16 @@
 
     //fetches data from api
     async function getData() {
-        return fetch(`https://${apiUrl}/parcelcheck`, {
+        return fetch(`https://${apiUrl}/parcelcheck?userId=${userId}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 authorization: apikey,
             },
-            body: JSON.stringify({ userId: userId }),
         });
     }
 
-    function waitforData(): Promise<data[]> {
+    function waitforData(): Promise<responsedata> {
         return new Promise((resolve, reject) => {
             getData().then((res) => {
                 if (res.status === 200) {
@@ -108,7 +110,7 @@
         >
             พัสดุของคุณ
         </h1>
-        {#if data.length >= 1}
+        {#if data.parcels.length >= 1}
             <div
                 class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3"
             >
@@ -131,7 +133,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {#each data as d}
+                        {#each data.parcels as d}
                             <tr
                                 class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                             >
@@ -151,6 +153,12 @@
                                         class="font-Prompt text-green-500 px-6 py-4"
                                     >
                                         อยู่ที่นิติบุคคล
+                                    </td>
+                                {:else if d.status === "found"}
+                                    <td
+                                        class="font-Prompt text-orange-400 dark:text-orange-300 px-6 py-4"
+                                    >
+                                        พบแล้ว โปรดติดต่อนิติบุคคล
                                     </td>
                                 {:else}
                                     <td

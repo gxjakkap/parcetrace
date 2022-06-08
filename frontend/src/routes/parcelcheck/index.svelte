@@ -10,17 +10,20 @@
     let phoneNumber: number | null;
 
     async function onSubmit() {
-        fetch(`https://${apiUrl}/getUserId`, {
-            method: "POST",
+        fetch(`https://${apiUrl}/getUserId?phoneNo=${phoneNumber}`, {
+            method: "GET",
             cache: "no-cache",
             headers: {
                 "Content-Type": "application/json",
                 authorization: apikey as string,
             },
-            body: JSON.stringify({ phoneNumber: phoneNumber }),
         }).then((res) => {
             if (res.status === 200) {
-                location.replace("/parcelcheck/res?q=".concat("userId"));
+                res.json().then((data) => {
+                    location.replace(
+                        "/parcelcheck/res?userId=".concat(data.userId)
+                    );
+                });
             } else {
                 console.log(res);
                 alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
