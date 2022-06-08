@@ -45,7 +45,7 @@ export const dbRemoveOnUnfollow = async (friendDocRef: FirebaseFirestore.Documen
 export const dbSetOnParcelRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: parcel) => {
     let userData = await ref.get()
     if (userData.exists) {
-        let activeParcels = userData.data()?.activeParcels as parcel[] || []
+        let activeParcels = userData.data()?.activeParcel as parcel[] || []
         activeParcels.push(data)
         await ref.set(userData)
     }
@@ -95,7 +95,7 @@ export const findUserWithPhoneNumber = async (collection: FirebaseFirestore.Coll
 export const getUserActiveParcels = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
     const doc = await ref.get()
     if (doc.exists) {
-        return doc.data()?.parcels
+        return doc.data()?.activeParcel
     }
     else {
         return []

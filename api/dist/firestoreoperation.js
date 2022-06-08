@@ -30,7 +30,7 @@ const dbSetOnParcelRegister = (ref, data) => __awaiter(void 0, void 0, void 0, f
     var _a;
     let userData = yield ref.get();
     if (userData.exists) {
-        let activeParcels = ((_a = userData.data()) === null || _a === void 0 ? void 0 : _a.activeParcels) || [];
+        let activeParcels = ((_a = userData.data()) === null || _a === void 0 ? void 0 : _a.activeParcel) || [];
         activeParcels.push(data);
         yield ref.set(userData);
     }
@@ -81,7 +81,7 @@ const getUserActiveParcels = (ref) => __awaiter(void 0, void 0, void 0, function
     var _b;
     const doc = yield ref.get();
     if (doc.exists) {
-        return (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.parcels;
+        return (_b = doc.data()) === null || _b === void 0 ? void 0 : _b.activeParcel;
     }
     else {
         return [];
