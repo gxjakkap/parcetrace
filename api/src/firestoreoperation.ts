@@ -7,7 +7,7 @@ interface friends {
 interface parcel {
     date: Date,
     carrier: string,
-    status: 'available' | 'lost',
+    status: 'available' | 'lost' | 'found',
     parcelId: string,
 }
 

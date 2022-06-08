@@ -34,7 +34,6 @@ const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
 const cors_1 = __importDefault(require("cors"));
-const greetings_1 = require("./greetings");
 const fst = __importStar(require("./firestoreoperation"));
 const msg = __importStar(require("./message"));
 //set port
@@ -82,7 +81,7 @@ app.post('/webhook', (req, res) => {
                     }
                 })
                     .then(data => {
-                    (0, greetings_1.sendGreetingMessage)(body.events[i].source.userId, channelAccessToken, data.data.displayName).catch(err => { console.log(err); });
+                    msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken, data.data.displayName).catch(err => { console.log(err); });
                     const docRef = db.collection('friends').doc(body.events[i].source.userId);
                     fst.dbSetOnFollow(docRef, { userId: data.data.userId, displayName: data.data.displayName, picLink: data.data.pictureUrl }).catch(err => { console.log(err); });
                 });
@@ -162,6 +161,103 @@ app.post('/userreg', (req, res) => {
             res.status(403).json({ status: 403, message: "Forbidden" });
             console.log('Forbidden request recieved');
         }
+    });
+});
+//get user id
+app.get('/getUserId', (req, res) => {
+    if (req.headers.authorization !== process.env.API_KEY) {
+        res.status(401).json({ status: 401, message: "Unauthorized" });
+        console.log('Unauthorized request recieved');
+        return;
+    }
+    let data;
+    try {
+        data = req.body;
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" });
+        console.log('Bad request recieved');
+        console.log(err);
+        return;
+    }
+    const collectionRef = db.collection('users');
+    fst.findUserWithPhoneNumber(collectionRef, data.phoneNumber)
+        .then(response => {
+        if (response.successful) {
+            if (response.statusCode === 200) {
+                res.status(200).json({ status: 200, userId: response.userId });
+            }
+            else {
+                res.status(500).json({ status: 500, message: "Internal Server Error" });
+            }
+        }
+        else {
+            res.status(response.statusCode).json({ status: response.statusCode, message: response.errorMessage });
+        }
+    })
+        .catch(err => {
+        console.log(err);
+        res.status(500).json({ status: 500, message: "Internal Server Error" });
+    });
+});
+app.get('/parcelcheck', (req, res) => {
+    //check for api key
+    if (req.headers.authorization !== process.env.API_KEY) {
+        res.status(401).json({ status: 401, message: "Unauthorized" });
+        console.log('Unauthorized request recieved');
+        return;
+    }
+    const userId = req.query.userId;
+    const docRef = db.collection('users').doc(userId);
+    fst.getUserActiveParcels(docRef)
+        .then(activeParcels => {
+        if (activeParcels.length > 0) {
+            console.log('active parcels found');
+            res.status(200).json({ status: 200, parcels: activeParcels });
+        }
+        else {
+            console.log('no active parcels found');
+            res.status(200).json({ status: 200, parcels: [] });
+        }
+    })
+        .catch(err => {
+        console.log(err);
+        res.status(500).json({ status: 500, message: "Internal Server Error" });
+    });
+});
+//parcel delete method
+app.delete('/parcel', (req, res) => {
+    //check for api key
+    if (req.headers.authorization !== process.env.API_KEY) {
+        res.status(401).json({ status: 401, message: "Unauthorized" });
+        console.log('Unauthorized request recieved');
+        return;
+    }
+    let data;
+    try {
+        data = req.body;
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" });
+        console.log('Bad request recieved');
+        console.log(err);
+        return;
+    }
+    const docRef = db.collection('users').doc(data.userId);
+    fst.getUserActiveParcels(docRef)
+        .then(activeParcels => {
+        if (activeParcels.length > 0) {
+            console.log('active parcels found');
+            res.status(200).json({ status: 200, parcels: activeParcels });
+        }
+        else {
+            console.log('no active parcels found');
+            res.status(200).json({ status: 200, parcels: [] });
+        }
+    })
+        .catch(err => {
+        console.log(err);
+        res.status(500).json({ status: 500, message: "Internal Server Error" });
     });
 });
 https_1.default.createServer(sslCredentials, app)
