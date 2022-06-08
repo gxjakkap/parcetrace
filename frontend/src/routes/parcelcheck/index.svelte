@@ -32,6 +32,10 @@
     }
 </script>
 
+<svelte:head>
+    <title>Parcel Check - Parcetrace</title>
+</svelte:head>
+
 <main>
     <div class="bg-gray-200 min-h-screen flex flex-col">
         <div
