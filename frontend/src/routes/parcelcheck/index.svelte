@@ -37,17 +37,21 @@
 </svelte:head>
 
 <main>
-    <div class="bg-gray-200 min-h-screen flex flex-col">
+    <div class="bg-gray-200 dark:bg-slate-800 min-h-screen flex flex-col">
         <div
             class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
         >
-            <div class="bg-white px-6 py-8 rounded shadow-md text-black w-full">
-                <h1 class="font-Prompt mb-8 text-3xl text-center">
+            <div
+                class="bg-white dark:bg-gray-700 px-6 py-8 rounded shadow-md text-black w-full"
+            >
+                <h1
+                    class="font-Prompt mb-8 text-3xl text-center text-black dark:text-white"
+                >
                     ตรวจสอบพัสดุ
                 </h1>
                 <input
                     type="tel"
-                    class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
+                    class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
                     placeholder="เบอร์โทรศัพท์"
                     on:keypress={(e) => {
                         if (e.key === "Enter") {
