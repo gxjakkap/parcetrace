@@ -229,7 +229,7 @@ app.get('/parcelcheck', (req, res) => {
     });
 });
 //parcel delete method
-app.delete('/parcel', (req, res) => {
+app.delete('/parcelrem', (req, res) => {
     //check for api key
     if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
