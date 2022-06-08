@@ -170,18 +170,9 @@ app.get('/getUserId', (req, res) => {
         console.log('Unauthorized request recieved');
         return;
     }
-    let data;
-    try {
-        data = req.body;
-    }
-    catch (err) {
-        res.status(400).json({ status: 400, message: "Bad Request" });
-        console.log('Bad request recieved');
-        console.log(err);
-        return;
-    }
+    const phoneNumber = parseInt(req.query.phoneNumber);
     const collectionRef = db.collection('users');
-    fst.findUserWithPhoneNumber(collectionRef, data.phoneNumber)
+    fst.findUserWithPhoneNumber(collectionRef, phoneNumber)
         .then(response => {
         if (response.successful) {
             if (response.statusCode === 200) {
