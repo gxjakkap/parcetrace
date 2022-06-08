@@ -49,6 +49,11 @@
                     type="tel"
                     class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
                     placeholder="เบอร์โทรศัพท์"
+                    on:keypress={(e) => {
+                        if (e.key === "Enter") {
+                            onSubmit();
+                        }
+                    }}
                     bind:value={phoneNumber}
                 />
 
