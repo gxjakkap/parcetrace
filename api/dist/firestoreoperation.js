@@ -59,7 +59,11 @@ const findUserWithPhoneNumber = (collection, phoneNumber) => __awaiter(void 0, v
         else if (dataArray.length == 1) {
             response.successful = true;
             response.statusCode = 200;
-            response.userId = dataArray[0].doc.data().userId;
+            response.userId = dataArray[0].data().userId;
+        }
+        else if (dataArray.length == 0) {
+            response.successful = true;
+            response.statusCode = 404;
         }
         else {
             response.statusCode = 500;

@@ -64,7 +64,7 @@ export const findUserWithPhoneNumber = async (collection: FirebaseFirestore.Coll
     const snapshot = await collection.where('phoneNumber', '==', phoneNumber).get()
     let response: findUserWithPhoneNumberResponse = { successful: false, statusCode: 500 }
     if (!snapshot.empty) {
-        let dataArray: FirebaseFirestore.DocumentData[] = []
+        let dataArray: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[] = []
         snapshot.forEach(doc => {
             dataArray.push(doc)
         })
@@ -74,7 +74,11 @@ export const findUserWithPhoneNumber = async (collection: FirebaseFirestore.Coll
         else if (dataArray.length == 1) {
             response.successful = true
             response.statusCode = 200
-            response.userId = dataArray[0].doc.data().userId
+            response.userId = dataArray[0].data().userId
+        }
+        else if (dataArray.length == 0) {
+            response.successful = true
+            response.statusCode = 404
         }
         else {
             response.statusCode = 500
