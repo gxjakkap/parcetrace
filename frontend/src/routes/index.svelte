@@ -1,10 +1,3 @@
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Parcetrace main website." />
+	<meta http-equiv="refresh" content="0;url=https://lin.ee/vimRsGY" />
 </svelte:head>
-
-<section>
-	<div class="text-center w-screen">
-		<h1 class="text-5xl">Hello World</h1>
-	</div>
-</section>
