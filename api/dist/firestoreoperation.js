@@ -47,6 +47,7 @@ const checkIfDocumentExist = (ref) => __awaiter(void 0, void 0, void 0, function
 exports.checkIfDocumentExist = checkIfDocumentExist;
 const findUserWithPhoneNumber = (collection, phoneNumber) => __awaiter(void 0, void 0, void 0, function* () {
     const snapshot = yield collection.where('phoneNumber', '==', phoneNumber.toString()).get();
+    console.log(phoneNumber.toString());
     let response = { successful: false, statusCode: 500 };
     if (!snapshot.empty) {
         let dataArray = [];

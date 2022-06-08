@@ -62,6 +62,7 @@ export const checkIfDocumentExist = async (ref: FirebaseFirestore.DocumentRefere
 
 export const findUserWithPhoneNumber = async (collection: FirebaseFirestore.CollectionReference, phoneNumber: number) => {
     const snapshot = await collection.where('phoneNumber', '==', phoneNumber.toString()).get()
+    console.log(phoneNumber.toString())
     let response: findUserWithPhoneNumberResponse = { successful: false, statusCode: 500 }
     if (!snapshot.empty) {
         let dataArray: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[] = []
