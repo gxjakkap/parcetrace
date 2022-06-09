@@ -15,7 +15,8 @@
     let loadingState = false;
 
     async function onSubmit() {
-        if (!/[^0-9\s]+$/.test(phoneNumber) || phoneNumber.length < 10) {
+        if (phoneNumber.length < 10) {
+            console.log(phoneNumber.length < 10);
             alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
             return;
         }

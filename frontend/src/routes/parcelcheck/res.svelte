@@ -100,7 +100,7 @@
                     class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
                 >
                     <thead
-                        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+                        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-800 dark:text-gray-400"
                     >
                         <tr>
                             <th scope="col" class="font-Prompt px-6 py-3">
@@ -117,7 +117,7 @@
                     <tbody>
                         {#each data.parcels as d}
                             <tr
-                                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                class="bg-white border-b dark:bg-gray-700 dark:border-gray-700"
                             >
                                 <th
                                     scope="row"
