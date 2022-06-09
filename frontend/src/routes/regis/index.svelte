@@ -92,47 +92,49 @@
 <main>
     {#if userId}
         <!--if userId exist-->
-        <div class="bg-gray-200 min-h-screen flex flex-col">
+        <div class="bg-gray-200 dark:bg-slate-800 min-h-screen flex flex-col">
             <div
                 class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
             >
                 <div
-                    class="bg-white px-6 py-8 rounded shadow-md text-black w-full"
+                    class="g-white dark:bg-gray-700 px-6 py-8 rounded shadow-md text-black w-full"
                 >
-                    <h1 class="font-Prompt mb-8 text-3xl text-center">
+                    <h1
+                        class="font-Prompt mb-8 text-3xl text-center text-black dark:text-white"
+                    >
                         ลงทะเบียน
                     </h1>
                     <input
                         type="text"
                         readonly
-                        class="font-Prompt block border border-gray-400 text-gray-500 w-full p-3 rounded focus:outline-none mb-4 cursor-not-allowed"
+                        class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500 cursor-not-allowed"
                         bind:value={userId}
                     />
 
                     <input
                         type="text"
-                        class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
+                        class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
                         placeholder="ชื่อจริง"
                         bind:value={userData.name}
                     />
 
                     <input
                         type="text"
-                        class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
+                        class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
                         placeholder="นามสกุล"
                         bind:value={userData.surname}
                     />
 
                     <input
                         type="text"
-                        class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
+                        class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
                         placeholder="เลขห้อง"
                         bind:value={userData.room}
                     />
 
                     <input
                         type="tel"
-                        class="font-Prompt block border border-gray-400 w-full p-3 rounded mb-4"
+                        class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
                         placeholder="เบอร์โทรติดต่อ"
                         bind:value={userData.phoneNumber}
                     />
