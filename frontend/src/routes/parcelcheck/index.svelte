@@ -13,6 +13,7 @@
     let loadingState = false;
 
     async function onSubmit() {
+        loadingState = true;
         fetch(`https://${apiUrl}/getUserId?phoneNo=${phoneNumber}`, {
             method: "GET",
             cache: "no-cache",
