@@ -8,11 +8,17 @@
     const apiUrl =
         process.env.NODE_ENV === "production" ? process.env.API_URL : API_URL;
 
-    let phoneNumber: number | null;
+    let phoneNumber: string = "";
+
+    $: phoneNumber = phoneNumber.replace(/[^0-9\s]+$/, "");
 
     let loadingState = false;
 
     async function onSubmit() {
+        if (!/[^0-9\s]+$/.test(phoneNumber) || phoneNumber.length < 10) {
+            alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
+            return;
+        }
         loadingState = true;
         fetch(`https://${apiUrl}/getUserId?phoneNo=${phoneNumber}`, {
             method: "GET",
