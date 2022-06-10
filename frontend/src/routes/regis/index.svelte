@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import { API_KEY, API_URL } from "$lib/env";
+    import Modal from "$lib/modal.svelte";
 
     //check for environment and set api key and url
     const apikey =
@@ -31,6 +32,16 @@
     $: userData.room = userData.room.replace(/[^a-zA-Z0-9\s]+$/, "");
     $: userData.phoneNumber = userData.phoneNumber.replace(/[^0-9\s]+$/, "");
 
+    let modalState = {
+        open: false,
+        title: "defaultTitle",
+        message: "defaultMessage",
+    };
+
+    const toggleModal = () => {
+        modalState.open = !modalState.open;
+    };
+
     //post data to api on button click
     async function onSubmit() {
         if (
@@ -39,7 +50,10 @@
             !userData.room ||
             !userData.phoneNumber
         ) {
-            alert("กรุณากรอกข้อมูลให้ครบ");
+            toggleModal();
+            modalState.title = "Error";
+            modalState.message = "กรุณากรอกข้อมูลให้ครบถ้วน";
+            //alert("กรุณากรอกข้อมูลให้ครบ");
             return;
         }
         if (
@@ -47,7 +61,10 @@
                 userData.phoneNumber
             )
         ) {
-            alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
+            toggleModal();
+            modalState.title = "Error";
+            modalState.message = "เบอร์โทรศัพท์ไม่ถูกต้อง";
+            /* alert("เบอร์โทรศัพท์ไม่ถูกต้อง"); */
             return;
         }
         fetch(`https://${apiUrl}/userreg`, {
@@ -65,17 +82,31 @@
                     location.replace("/regis/success");
                 } else if (res.status === 409) {
                     console.log(res);
-                    alert("คุณได้ลงทะเบียนไปแล้ว");
+                    toggleModal();
+                    modalState.title = "Error";
+                    modalState.message = "คุณได้ลงทะเบียนไปแล้ว";
+                    /* alert("คุณได้ลงทะเบียนไปแล้ว"); */
                 } else if (res.status === 500) {
                     console.log(res);
-                    alert(
+                    toggleModal();
+                    modalState.title = "Error";
+                    modalState.message =
+                        "เกิดข้อผิดพลาดขึ้นกับเซิร์ฟเวอร์ลงทะเบียน โปรดลองใหม่อีกครั้ง";
+                    /* alert(
                         "เกิดข้อผิดพลาดขึ้นกับเซิร์ฟเวอร์ลงทะเบียน โปรดลองใหม่อีกครั้ง"
-                    ); //TODO: show error modal instead of alert
+                    );  */
                 } else if (res.status === 403) {
-                    alert("คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!");
+                    toggleModal();
+                    modalState.title = "Error";
+                    modalState.message =
+                        "คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!";
+                    /* alert("คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!"); */
                 } else {
                     console.log(res);
-                    alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
+                    toggleModal();
+                    modalState.title = "Error";
+                    modalState.message = "มีข้อผิดพลาดบางอย่าง";
+                    /* alert("มีข้อผิดพลาดบางอย่าง"); */
                 }
             })
             .catch((err) => {
@@ -96,6 +127,15 @@
             <div
                 class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
             >
+                <Modal
+                    title={modalState.title}
+                    open={modalState.open}
+                    on:close={() => toggleModal()}
+                >
+                    <svelte:fragment slot="body">
+                        {modalState.message}
+                    </svelte:fragment>
+                </Modal>
                 <div
                     class="g-white dark:bg-gray-700 px-6 py-8 rounded shadow-md text-black w-full"
                 >

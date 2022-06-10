@@ -1,6 +1,7 @@
 <script lang="ts">
     import { API_KEY, API_URL } from "$lib/env";
     import Loading from "$lib/loading.svelte";
+    import Modal from "$lib/modal.svelte";
 
     //check for environment and set api key and url
     const apikey =
@@ -13,11 +14,23 @@
     $: phoneNumber = phoneNumber.replace(/[^0-9\s]+$/, "");
 
     let loadingState = false;
+    let modalState = {
+        open: false,
+        title: "defaultTitle",
+        message: "defaultMessage",
+    };
+
+    const toggleModal = () => {
+        modalState.open = !modalState.open;
+    };
 
     async function onSubmit() {
         if (phoneNumber.length < 10) {
             console.log(phoneNumber.length < 10);
-            alert("เบอร์โทรศัพท์ไม่ถูกต้อง");
+            toggleModal();
+            modalState.title = "Error";
+            modalState.message = "เบอร์โทรศัพท์ไม่ถูกต้อง";
+            /* alert("เบอร์โทรศัพท์ไม่ถูกต้อง"); */
             return;
         }
         loadingState = true;
@@ -37,7 +50,10 @@
                 });
             } else {
                 console.log(res);
-                alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
+                toggleModal();
+                modalState.title = "Error";
+                modalState.message = "เกิดข้อผิดพลาดบางอย่าง ลองอีกครั้ง";
+                /* alert("มีข้อผิดพลาดบางอย่าง"); */
             }
         });
     }
@@ -53,6 +69,15 @@
             <div
                 class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
             >
+                <Modal
+                    title={modalState.title}
+                    open={modalState.open}
+                    on:close={() => toggleModal()}
+                >
+                    <svelte:fragment slot="body">
+                        {modalState.message}
+                    </svelte:fragment>
+                </Modal>
                 <div
                     class="bg-white dark:bg-gray-700 px-6 py-8 rounded shadow-md text-black w-full"
                 >
