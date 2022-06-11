@@ -2,6 +2,7 @@
     import { page } from "$app/stores";
     import Loading from "$lib/loading.svelte";
     import { API_KEY, API_URL } from "$lib/env";
+    import { Available, Lost, Found } from "$lib/parcelStatus/main";
 
     let apikey: string;
     let apiUrl: string;
@@ -131,23 +132,11 @@
                                     {d.carrier}
                                 </td>
                                 {#if d.status === "available"}
-                                    <td
-                                        class="font-Prompt text-green-500 px-6 py-4"
-                                    >
-                                        อยู่ที่นิติบุคคล
-                                    </td>
+                                    <Available />
                                 {:else if d.status === "found"}
-                                    <td
-                                        class="font-Prompt text-orange-400 dark:text-orange-300 px-6 py-4"
-                                    >
-                                        พบแล้ว โปรดติดต่อนิติบุคคล
-                                    </td>
+                                    <Found />
                                 {:else}
-                                    <td
-                                        class="font-Prompt text-red-500 px-6 py-4"
-                                    >
-                                        สูญหาย
-                                    </td>
+                                    <Lost />
                                 {/if}
                             </tr>
                         {/each}
