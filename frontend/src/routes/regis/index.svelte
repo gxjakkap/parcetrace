@@ -54,7 +54,6 @@
             toggleModal();
             modalState.title = "Error";
             modalState.message = "กรุณากรอกข้อมูลให้ครบถ้วน";
-            //alert("กรุณากรอกข้อมูลให้ครบ");
             return;
         }
         if (
@@ -65,7 +64,6 @@
             toggleModal();
             modalState.title = "Error";
             modalState.message = "เบอร์โทรศัพท์ไม่ถูกต้อง";
-            /* alert("เบอร์โทรศัพท์ไม่ถูกต้อง"); */
             return;
         }
         fetch(`https://${apiUrl}/userreg`, {
@@ -78,36 +76,26 @@
             body: JSON.stringify(userData),
         })
             .then((res) => {
-                //TODO: remove console.log
                 if (res.status === 200) {
                     location.replace("/regis/success");
                 } else if (res.status === 409) {
-                    console.log(res);
                     toggleModal();
                     modalState.title = "Error";
                     modalState.message = "คุณได้ลงทะเบียนไปแล้ว";
-                    /* alert("คุณได้ลงทะเบียนไปแล้ว"); */
                 } else if (res.status === 500) {
-                    console.log(res);
                     toggleModal();
                     modalState.title = "Error";
                     modalState.message =
                         "เกิดข้อผิดพลาดขึ้นกับเซิร์ฟเวอร์ลงทะเบียน โปรดลองใหม่อีกครั้ง";
-                    /* alert(
-                        "เกิดข้อผิดพลาดขึ้นกับเซิร์ฟเวอร์ลงทะเบียน โปรดลองใหม่อีกครั้ง"
-                    );  */
                 } else if (res.status === 403) {
                     toggleModal();
                     modalState.title = "Error";
                     modalState.message =
                         "คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!";
-                    /* alert("คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!"); */
                 } else {
-                    console.log(res);
                     toggleModal();
                     modalState.title = "Error";
                     modalState.message = "มีข้อผิดพลาดบางอย่าง";
-                    /* alert("มีข้อผิดพลาดบางอย่าง"); */
                 }
             })
             .catch((err) => {

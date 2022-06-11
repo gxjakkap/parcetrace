@@ -30,7 +30,6 @@
             toggleModal();
             modalState.title = "Error";
             modalState.message = "เบอร์โทรศัพท์ไม่ถูกต้อง";
-            /* alert("เบอร์โทรศัพท์ไม่ถูกต้อง"); */
             return;
         }
         loadingState = true;
@@ -53,7 +52,6 @@
                 toggleModal();
                 modalState.title = "Error";
                 modalState.message = "เกิดข้อผิดพลาดบางอย่าง ลองอีกครั้ง";
-                /* alert("มีข้อผิดพลาดบางอย่าง"); */
             }
         });
     }

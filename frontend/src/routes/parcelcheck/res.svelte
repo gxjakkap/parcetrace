@@ -31,13 +31,6 @@
     //get userId params from url (https://domain.ext/parcecheck?userId="userId")
     let userId: string | null = $page.url.searchParams.get("userId") || null;
 
-    //mock data for test
-    /* let data: data[] = [
-        { date: 1653831551000, carrier: "Kerry", status: "available" },
-        { date: 1653853361000, carrier: "ThaiPost", status: "available" },
-        { date: 1649952755000, carrier: "LEX TH", status: "lost" },
-    ]; */
-
     //validate userId with regex. if input doesn't match, make it null to display error
     if (userId && !/U[0-9a-f]{32}/.test(userId)) {
         userId = null;
