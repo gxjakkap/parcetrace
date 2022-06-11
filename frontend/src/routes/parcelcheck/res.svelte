@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from "$app/stores";
     import Loading from "$lib/loading.svelte";
+    import Statuspage from "$lib/statuspage.svelte";
     import { API_KEY, API_URL } from "$lib/env";
     import { Available, Lost, Found } from "$lib/parcelStatus/main";
 
@@ -144,19 +145,7 @@
                 </table>
             </div>
         {:else}
-            <div
-                class="drop-shadow-lg container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
-            >
-                <div
-                    class="bg-slate-200 dark:bg-slate-900 px-6 py-8 rounded shadow-md text-black w-full"
-                >
-                    <h1
-                        class="font-Prompt text-black dark:text-white mb-8 mt-8 text-3xl text-center"
-                    >
-                        คุณไม่มีพัสดุในระบบ
-                    </h1>
-                </div>
-            </div>
+            <Statuspage message="คุณไม่มีพัสดุในระบบ" />
         {/if}
     {/await}
 </main>

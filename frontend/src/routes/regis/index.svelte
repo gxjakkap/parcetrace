@@ -2,6 +2,7 @@
     import { page } from "$app/stores";
     import { API_KEY, API_URL } from "$lib/env";
     import Modal from "$lib/modal.svelte";
+    import Statuspage from "$lib/statuspage.svelte";
 
     //check for environment and set api key and url
     const apikey =
@@ -189,26 +190,16 @@
         </div>
     {:else}
         <!--if userId doesn't exist/ is null-->
-        <div class="bg-gray-200 min-h-screen flex flex-col">
-            <div
-                class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
-            >
-                <div
-                    class="bg-white px-6 py-8 rounded shadow-md text-black w-full"
-                >
-                    <h1 class="font-Prompt mb-8 text-3xl text-center">
-                        Error: userId is missing or invalid.
-                    </h1>
-                    <br />
-                    <p class="text-center">
-                        Click <a
-                            href="/"
-                            class="text-blue-700 underline hover:text-sky-500"
-                            >here</a
-                        > to go back home.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <Statuspage message="Error: userId is missing or invalid">
+            <svelte:fragment slot="body">
+                <p class="text-center">
+                    Click <a
+                        href="/"
+                        class="text-blue-700 underline hover:text-sky-500"
+                        >here</a
+                    > to go back home.
+                </p>
+            </svelte:fragment>
+        </Statuspage>
     {/if}
 </main>

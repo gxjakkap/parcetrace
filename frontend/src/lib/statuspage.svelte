@@ -10,6 +10,7 @@
             <h1 class="font-Prompt mb-8 text-3xl text-center">
                 {message}
             </h1>
+            <slot name="body" />
         </div>
     </div>
 </div>
