@@ -89,6 +89,7 @@ app.post('/webhook', (req: Request, res: Response) => {
 //parcel register path
 app.post('/parcelreg', (req: Request, res: Response) => {
     const body = req.body
+    console.log(body)
     let randomUUID = crypto.randomUUID();
     const date = new Date
     const dataForUser: fst.userParcel = { status: 'available', date: date, sender: body.sender, parcelId: crypto.randomUUID(), location: body.location }
