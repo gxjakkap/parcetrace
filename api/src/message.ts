@@ -24,7 +24,7 @@ export async function sendGreetingMessage(userId: string, channelAccessToken: st
 }
 
 export async function sendParcelNotificationMessage(userId: string, channelAccessToken: string, parcelData: userParcel) {
-    const message: TextMessage = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุจาก ${parcelData.carrier} มาส่งค้าบ\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?parcelId=${parcelData.parcelId}` }
+    const message: TextMessage = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุมาส่งค้าบ\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?parcelId=${parcelData.parcelId}` }
     return sendMessage(message, channelAccessToken, userId)
 }
 

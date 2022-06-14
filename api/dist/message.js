@@ -41,7 +41,7 @@ function sendGreetingMessage(userId, channelAccessToken, displayName) {
 exports.sendGreetingMessage = sendGreetingMessage;
 function sendParcelNotificationMessage(userId, channelAccessToken, parcelData) {
     return __awaiter(this, void 0, void 0, function* () {
-        const message = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุจาก ${parcelData.carrier} มาส่งค้าบ\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?parcelId=${parcelData.parcelId}` };
+        const message = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุมาส่งค้าบ\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?parcelId=${parcelData.parcelId}` };
         return sendMessage(message, channelAccessToken, userId);
     });
 }

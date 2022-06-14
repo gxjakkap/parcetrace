@@ -6,14 +6,16 @@ interface friends {
 
 interface userParcel {
     date: Date,
-    carrier: string,
+    sender: string,
+    location: string,
     status: 'available' | 'lost' | 'found',
     parcelId: string,
 }
 
 interface allParcel {
     date: Date,
-    carrier: string,
+    sender: string,
+    location: string,
     status: 'available' | 'lost' | 'found',
     parcelId: string,
     userId: string,

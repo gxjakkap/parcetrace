@@ -107,8 +107,8 @@ app.post('/webhook', (req, res) => {
 app.post('/parcelreg', (req, res) => {
     const body = req.body;
     let randomUUID = crypto_1.default.randomUUID();
-    const dataForUser = { status: body.status, date: new Date, carrier: body.carrier, parcelId: crypto_1.default.randomUUID() };
-    const dataForAllActive = { status: body.status, date: new Date, carrier: body.carrier, parcelId: crypto_1.default.randomUUID(), userId: body.userId };
+    const dataForUser = { status: body.status, date: new Date, sender: body.sender, parcelId: crypto_1.default.randomUUID(), location: body.location };
+    const dataForAllActive = { status: body.status, date: new Date, sender: body.sender, parcelId: crypto_1.default.randomUUID(), userId: body.userId, location: body.location };
     const userRef = db.collection('users').doc(body.userId);
     const allActiveRef = db.collection('allActiveParcel').doc(randomUUID);
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
