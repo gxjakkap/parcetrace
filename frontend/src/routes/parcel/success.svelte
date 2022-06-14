@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Success from "$lib/success.svelte";
+    import Success from "$lib/statuspage.svelte";
 </script>
 
 <svelte:head>
