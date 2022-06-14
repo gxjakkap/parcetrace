@@ -18,9 +18,11 @@
     }
 
     interface parcels {
-        date?: number;
-        carrier?: string;
-        status?: "available" | "lost" | "found";
+        date: Date;
+        sender: string;
+        location: string;
+        status: "available" | "lost" | "found";
+        parcelId: string;
     }
 
     interface responsedata {
@@ -123,7 +125,7 @@
                                 <td
                                     class="font-Prompt text-gray-900 dark:text-white px-6 py-4"
                                 >
-                                    {d.carrier}
+                                    {d.sender}
                                 </td>
                                 {#if d.status === "available"}
                                     <Available />
