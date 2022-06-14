@@ -89,7 +89,7 @@ app.post('/webhook', (req: Request, res: Response) => {
 //parcel register path
 app.post('/parcelreg', (req: Request, res: Response) => {
     //check for api key
-    if (req.headers.authorization !== process.env.APIKEY) {
+    if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ error: 'unauthorized' })
         return
     }

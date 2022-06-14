@@ -106,7 +106,7 @@ app.post('/webhook', (req, res) => {
 //parcel register path
 app.post('/parcelreg', (req, res) => {
     //check for api key
-    if (req.headers.authorization !== process.env.APIKEY) {
+    if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ error: 'unauthorized' });
         return;
     }
