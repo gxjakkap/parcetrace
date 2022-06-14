@@ -88,7 +88,19 @@ app.post('/webhook', (req: Request, res: Response) => {
 //unfinished
 //parcel register path
 app.post('/parcelreg', (req: Request, res: Response) => {
-    const body = req.body
+    //check for api key
+    if (req.headers.authorization !== process.env.APIKEY) {
+        res.status(401).json({ error: 'unauthorized' })
+        return
+    }
+    let body: any
+    try {
+        body = req.body
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).json({ status: 400, message: 'bad request' })
+    }
     console.log(body)
     let randomUUID = crypto.randomUUID();
     const date = new Date
