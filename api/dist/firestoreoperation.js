@@ -32,7 +32,7 @@ const dbSetOnParcelRegister = (userRef, userParcelData, allActiveRef, parcelData
     if (userData.exists) {
         let activeParcels = ((_a = userData.data()) === null || _a === void 0 ? void 0 : _a.activeParcel) || [];
         activeParcels.push(userParcelData);
-        yield userRef.set(userData, { merge: true });
+        yield userRef.update({ activeParcel: activeParcels });
     }
     yield allActiveRef.set(parcelData);
 });

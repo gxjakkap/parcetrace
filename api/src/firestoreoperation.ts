@@ -57,7 +57,7 @@ export const dbSetOnParcelRegister = async (userRef: FirebaseFirestore.DocumentR
     if (userData.exists) {
         let activeParcels = userData.data()?.activeParcel as userParcel[] || []
         activeParcels.push(userParcelData)
-        await userRef.set(userData, { merge: true })
+        await userRef.update({ activeParcel: activeParcels })
     }
     await allActiveRef.set(parcelData)
 }
