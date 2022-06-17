@@ -120,8 +120,8 @@ app.post('/parcelreg', (req, res) => {
     console.log(body);
     let randomUUID = crypto_1.default.randomUUID();
     const date = new Date;
-    const dataForUser = { status: 'available', date: date, sender: body.sender, parcelId: crypto_1.default.randomUUID(), location: body.location };
-    const dataForAllActive = { status: 'available', date: date, sender: body.sender, parcelId: crypto_1.default.randomUUID(), userId: body.userId, location: body.location };
+    const dataForUser = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: crypto_1.default.randomUUID(), location: body.location };
+    const dataForAllActive = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: crypto_1.default.randomUUID(), userId: body.userId, location: body.location };
     const userRef = db.collection('users').doc(body.userId);
     const allActiveRef = db.collection('allActiveParcel').doc(randomUUID);
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)

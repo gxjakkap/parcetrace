@@ -5,7 +5,7 @@ interface friends {
 }
 
 interface userParcel {
-    date: Date,
+    date: number,
     sender: string,
     location: string,
     status: 'available' | 'lost' | 'found',
@@ -13,7 +13,7 @@ interface userParcel {
 }
 
 interface allParcel {
-    date: Date,
+    date: number,
     sender: string,
     location: string,
     status: 'available' | 'lost' | 'found',
