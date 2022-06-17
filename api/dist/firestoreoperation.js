@@ -89,10 +89,10 @@ const findUserWithPhoneNumber = (collection, phoneNumber) => __awaiter(void 0, v
 });
 exports.findUserWithPhoneNumber = findUserWithPhoneNumber;
 const getUserActiveParcels = (ref) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _c, _d;
     const doc = yield ref.get();
     if (doc.exists) {
-        return (_c = doc.data()) === null || _c === void 0 ? void 0 : _c.activeParcel;
+        return (((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.activeParcel) !== undefined) ? (_d = doc.data()) === null || _d === void 0 ? void 0 : _d.activeParcel : [];
     }
     else {
         return [];
