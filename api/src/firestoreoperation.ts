@@ -122,5 +122,10 @@ export const getUserActiveParcels = async (ref: FirebaseFirestore.DocumentRefere
     }
 }
 
-export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister }
+export const getParcelDataFromAllParcel = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+    const doc = await ref.get()
+    return doc.exists ? doc.data() : null
+}
+
+export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber }
 export type { friends, userParcel, allParcel, userData }

@@ -229,6 +229,30 @@ app.get('/parcelcheck', (req: Request, res: Response) => {
         })
 })
 
+app.get('/getparceldata', (req: Request, res: Response) => {
+    //check for api key
+    if (req.headers.authorization !== process.env.API_KEY) {
+        res.status(401).json({ status: 401, message: "Unauthorized" })
+        console.log('Unauthorized request recieved')
+        return
+    }
+    const parcelId = req.query.parcelId as string
+    const docRef = db.collection('allActiveParcel').doc(parcelId)
+    fst.getParcelDataFromAllParcel(docRef)
+        .then(data => {
+            if (!data) {
+                res.status(404).json({ status: 404, message: "Parcel not found" })
+                return
+            }
+            console.log('parcel data found')
+            res.status(200).json({ status: 200, data: data })
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({ status: 500, message: "Internal Server Error" })
+        })
+})
+
 //parcel delete method
 app.delete('/parcelrem', (req: Request, res: Response) => {
     //check for api key

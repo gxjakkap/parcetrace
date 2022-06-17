@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserActiveParcels = exports.findUserWithPhoneNumber = exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbRemoveParcelFromUserData = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
+exports.getParcelDataFromAllParcel = exports.getUserActiveParcels = exports.findUserWithPhoneNumber = exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbRemoveParcelFromUserData = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
 const dbSetOnFollow = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.set(data);
 });
@@ -99,4 +99,9 @@ const getUserActiveParcels = (ref) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getUserActiveParcels = getUserActiveParcels;
-exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveOnUnfollow, dbRemoveDoc: exports.dbRemoveDoc, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister };
+const getParcelDataFromAllParcel = (ref) => __awaiter(void 0, void 0, void 0, function* () {
+    const doc = yield ref.get();
+    return doc.exists ? doc.data() : null;
+});
+exports.getParcelDataFromAllParcel = getParcelDataFromAllParcel;
+exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveOnUnfollow, dbRemoveDoc: exports.dbRemoveDoc, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister, getParcelDataFromAllParcel: exports.getParcelDataFromAllParcel, getUserActiveParcels: exports.getUserActiveParcels, checkIfDocumentExist: exports.checkIfDocumentExist, findUserWithPhoneNumber: exports.findUserWithPhoneNumber };
