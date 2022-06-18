@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { TextMessage } from '@line/bot-sdk'
-import { userData, userParcel } from './firestoreoperation'
+import { userData, userParcel, allParcel } from './firestoreoperation'
 
 const baseUrl = 'https://parcetrace.vercel.app/'
 
@@ -11,6 +11,17 @@ async function sendMessage(message: TextMessage, channelAccessToken: string, use
         messages: [message],
     }
     return axios.post('https://api.line.me/v2/bot/message/push', body, { headers: headers })
+}
+
+const localeDateString = (date: number) => {
+    let epdate = new Date(date)
+    return epdate.toLocaleDateString("th-TH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+    })
 }
 
 export async function sendRegistrationConfirmMessage(userId: string, channelAccessToken: string, userData: userData) {
@@ -24,8 +35,14 @@ export async function sendGreetingMessage(userId: string, channelAccessToken: st
 }
 
 export async function sendParcelNotificationMessage(userId: string, channelAccessToken: string, parcelData: userParcel) {
-    const message: TextMessage = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุมาส่งค้าบ\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?pid=${parcelData.parcelId}` }
+    const message: TextMessage = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุมาส่งค้าบ📦\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?pid=${parcelData.parcelId}` }
     return sendMessage(message, channelAccessToken, userId)
 }
 
-export default { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage }
+export async function sendParcelRecievedNotificationMessage(userId: string, channelAccessToken: string, parcelData: allParcel) {
+    const now = new Date().getTime()
+    const message: TextMessage = { type: 'text', text: `📦🪧พัสดุของคุณถูกรับไปแล้ว\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\nวันที่พัสดุมาถึง: ${localeDateString(parcelData.date)}\nวันที่พัสดุถูกรับไป: ${localeDateString(now)}\n\nหากนี่ไม่ใช่คุณ โปรดแจ้งนิติบุคคล` }
+    return sendMessage(message, channelAccessToken, userId)
+}
+
+export default { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage, sendParcelRecievedNotificationMessage }
