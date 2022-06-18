@@ -2,6 +2,7 @@
     import { page } from "$app/stores";
     import { API_KEY, API_URL } from "$lib/env";
     import Loading from "$lib/loading.svelte";
+    import Status from "$lib/statuspage.svelte";
 
     let apikey: string;
     let apiUrl: string;
@@ -23,6 +24,8 @@
         parcelId: string;
     }
 
+    let loadingStateAfterSubmit: boolean = false;
+
     //get parcelId from params
     let parcelId: string | null = $page.url.searchParams.get("pid");
 
@@ -36,17 +39,6 @@
         parcelId = null;
     }
 
-    async function parcelRecieved(parcelId: string | null) {
-        return fetch(`https://${apiUrl}/parcelrem`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-                authorization: apikey,
-            },
-            body: JSON.stringify({ parcelId: parcelId }),
-        });
-    }
-
     async function getParcelData(parcelId: string | null) {
         return fetch(`https://${apiUrl}/getparceldata?parcelId=${parcelId}`, {
             method: "GET",
@@ -57,6 +49,20 @@
         });
     }
 
+    async function parcelRecieved(parcelId: string | null) {
+        loadingStateAfterSubmit = true;
+        return fetch(`https://${apiUrl}/parcelrem`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: apikey,
+            },
+            body: JSON.stringify({
+                parcelId: parcelId,
+            }),
+        });
+    }
+
     function waitforData(): Promise<userParcel> {
         return new Promise((resolve, reject) => {
             getParcelData(parcelId).then((res) => {
@@ -64,6 +70,8 @@
                     res.json().then((data) => {
                         resolve(data.data);
                     });
+                } else if (res.status === 404) {
+                    reject(res.status);
                 } else {
                     reject(res.status);
                 }
@@ -87,47 +95,57 @@
 <main>
     <div class="bg-gray-200 dark:bg-slate-800 min-h-screen flex flex-col">
         {#if parcelId}
-            {#await waitforData()}
-                <Loading />
-            {:then parcel}
-                <div
-                    class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
-                >
+            {#if !loadingStateAfterSubmit}
+                {#await waitforData()}
+                    <Loading />
+                {:then parcel}
                     <div
-                        class="bg-white dark:bg-slate-700 px-6 py-8 rounded shadow-md text-black dark:text-white w-full"
+                        class="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2"
                     >
-                        <h1 class="font-Prompt mb-8 text-3xl text-center">
-                            ยืนยันการรับพัสดุ
-                        </h1>
-                        <p class="font-Prompt text-center">
-                            <b>ยืนยันการรับพัสดุจาก:</b>
-                            {parcel.sender}
-                        </p>
-                        <p class="font-Prompt mb-4 text-center">
-                            <b>พัสดุมาถึงเมื่อ:</b>
-                            {localeDateString(parcel.date)}
-                        </p>
-                        <button
-                            type="submit"
-                            class="font-Prompt w-full text-center py-3 rounded bg-green-500 dark:bg-green-600 text-white hover:bg-green-700 focus:outline-none my-1"
-                            on:click={() => {
-                                parcelRecieved(parcelId).then((res) => {
-                                    if (res.status === 200) {
-                                        location.replace(
-                                            "/parcelcheck/success"
-                                        );
-                                    } else {
-                                        console.log(res);
-                                        alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
-                                    }
-                                });
-                            }}
+                        <div
+                            class="bg-white dark:bg-slate-700 px-6 py-8 rounded shadow-md text-black dark:text-white w-full"
                         >
-                            ยืนยัน
-                        </button>
+                            <h1 class="font-Prompt mb-8 text-3xl text-center">
+                                ยืนยันการรับพัสดุ
+                            </h1>
+                            <p class="font-Prompt text-center">
+                                <b>ยืนยันการรับพัสดุจาก:</b>
+                                {parcel.sender}
+                            </p>
+                            <p class="font-Prompt mb-4 text-center">
+                                <b>พัสดุมาถึงเมื่อ:</b>
+                                {localeDateString(parcel.date)}
+                            </p>
+                            <button
+                                type="submit"
+                                class="font-Prompt w-full text-center py-3 rounded bg-green-500 dark:bg-green-600 text-white hover:bg-green-700 focus:outline-none my-1"
+                                on:click={() => {
+                                    parcelRecieved(parcelId).then((res) => {
+                                        if (res.status === 200) {
+                                            location.replace(
+                                                "/confirmation/success"
+                                            );
+                                        } else {
+                                            console.log(res);
+                                            alert("มีข้อผิดพลาดบางอย่าง"); //TODO: show error modal instead of alert
+                                        }
+                                    });
+                                }}
+                            >
+                                ยืนยัน
+                            </button>
+                        </div>
                     </div>
-                </div>
-            {/await}
+                {:catch error}
+                    {#if error === 404}
+                        <Status message="ไม่พบพัสดุ" />
+                    {:else}
+                        <Status message="Error" />
+                    {/if}
+                {/await}
+            {:else}
+                <Loading />
+            {/if}
         {:else}
             <!--if parcelId doesn't exist/ is null-->
             <div class="bg-gray-200 min-h-screen flex flex-col">
