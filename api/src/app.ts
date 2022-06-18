@@ -275,7 +275,7 @@ app.delete('/parcelrem', (req: Request, res: Response) => {
     }
 
     //get user data reference
-    const docRef = db.collection('users').doc(data.userId)
+    const docRef = db.collection('users').doc(data.userId as string)
 
     //get user active parcels reference
     fst.getUserActiveParcels(docRef)
