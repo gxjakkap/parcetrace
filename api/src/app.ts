@@ -266,6 +266,9 @@ app.delete('/parcelrem', (req: Request, res: Response) => {
     let data: any
     try {
         data = req.body
+        if (!data.parcelId) {
+            throw new Error('Invalid data')
+        }
     }
     catch (err) {
         res.status(400).json({ status: 400, message: "Bad Request" })
@@ -274,27 +277,35 @@ app.delete('/parcelrem', (req: Request, res: Response) => {
         return
     }
 
-    //get user data reference
-    const docRef = db.collection('users').doc(data.userId as string)
-
-    //get user active parcels reference
-    fst.getUserActiveParcels(docRef)
-        .then(activeParcels => {
-            if (activeParcels.length > 0) {
-                fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId))
-                fst.dbRemoveParcelFromUserData(docRef, data.parcelId)
-                res.status(200).json({ status: 200, message: "Parcel deleted" })
+    const docRef = db.collection('allActiveParcel').doc(data.parcelId)
+    fst.getParcelDataFromAllParcel(docRef)
+        .then(pData => {
+            if (!pData) {
+                res.status(404).json({ status: 404, message: "Parcel not found" })
+                return
             }
-            else {
-                console.log('no active parcels found')
-                res.status(404).json({ status: 404, message: "No active parcels found" })
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ status: 500, message: "Internal Server Error" })
+            console.log('parcel data found')
+            const userId = pData.userId
+            const userDocRef = db.collection('users').doc(userId)
+            fst.getUserActiveParcels(userDocRef)
+                .then(activeParcels => {
+                    if (activeParcels.length > 0) {
+                        fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId))
+                        fst.dbRemoveParcelFromUserData(userDocRef, data.parcelId)
+                        res.status(200).json({ status: 200, message: "Parcel deleted" })
+                    }
+                    else {
+                        console.log('no active parcels found')
+                        res.status(404).json({ status: 404, message: "No active parcels found" })
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    res.status(500).json({ status: 500, message: "Internal Server Error" })
+                })
         })
 })
+
 
 https.createServer(sslCredentials, app)
     .listen(port, () => {

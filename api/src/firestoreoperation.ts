@@ -67,7 +67,7 @@ export const dbRemoveParcelFromUserData = async (userRef: FirebaseFirestore.Docu
     if (userData.exists) {
         let activeParcels = userData.data()?.activeParcel as userParcel[] || []
         activeParcels = activeParcels.filter(parcel => parcel.parcelId !== parcelId)
-        await userRef.set(userData)
+        await userRef.update({ activeParcel: activeParcels })
     }
 }
 

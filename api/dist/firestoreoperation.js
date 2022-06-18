@@ -43,7 +43,7 @@ const dbRemoveParcelFromUserData = (userRef, parcelId) => __awaiter(void 0, void
     if (userData.exists) {
         let activeParcels = ((_b = userData.data()) === null || _b === void 0 ? void 0 : _b.activeParcel) || [];
         activeParcels = activeParcels.filter(parcel => parcel.parcelId !== parcelId);
-        yield userRef.set(userData);
+        yield userRef.update({ activeParcel: activeParcels });
     }
 });
 exports.dbRemoveParcelFromUserData = dbRemoveParcelFromUserData;
