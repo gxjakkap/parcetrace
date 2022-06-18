@@ -39,10 +39,4 @@ export async function sendParcelNotificationMessage(userId: string, channelAcces
     return sendMessage(message, channelAccessToken, userId)
 }
 
-export async function sendParcelRecievedNotificationMessage(userId: string, channelAccessToken: string, parcelData: allParcel) {
-    const now = new Date().getTime()
-    const message: TextMessage = { type: 'text', text: `📦🪧พัสดุของคุณถูกรับไปแล้ว\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\nวันที่พัสดุมาถึง: ${localeDateString(parcelData.date)}\nวันที่พัสดุถูกรับไป: ${localeDateString(now)}\n\nหากนี่ไม่ใช่คุณ โปรดแจ้งนิติบุคคล` }
-    return sendMessage(message, channelAccessToken, userId)
-}
-
-export default { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage, sendParcelRecievedNotificationMessage }
+export default { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage }

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendParcelRecievedNotificationMessage = exports.sendParcelNotificationMessage = exports.sendGreetingMessage = exports.sendRegistrationConfirmMessage = void 0;
+exports.sendParcelNotificationMessage = exports.sendGreetingMessage = exports.sendRegistrationConfirmMessage = void 0;
 const axios_1 = __importDefault(require("axios"));
 const baseUrl = 'https://parcetrace.vercel.app/';
 function sendMessage(message, channelAccessToken, userId) {
@@ -56,12 +56,4 @@ function sendParcelNotificationMessage(userId, channelAccessToken, parcelData) {
     });
 }
 exports.sendParcelNotificationMessage = sendParcelNotificationMessage;
-function sendParcelRecievedNotificationMessage(userId, channelAccessToken, parcelData) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const now = new Date().getTime();
-        const message = { type: 'text', text: `📦🪧พัสดุของคุณถูกรับไปแล้ว\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\nวันที่พัสดุมาถึง: ${localeDateString(parcelData.date)}\nวันที่พัสดุถูกรับไป: ${localeDateString(now)}\n\nหากนี่ไม่ใช่คุณ โปรดแจ้งนิติบุคคล` };
-        return sendMessage(message, channelAccessToken, userId);
-    });
-}
-exports.sendParcelRecievedNotificationMessage = sendParcelRecievedNotificationMessage;
-exports.default = { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage, sendParcelRecievedNotificationMessage };
+exports.default = { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage };

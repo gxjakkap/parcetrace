@@ -286,9 +286,6 @@ app.delete('/parcelrem', (req: Request, res: Response) => {
             }
             console.log('parcel data found')
             const userId = pData.userId
-
-            msg.sendParcelRecievedNotificationMessage(userId as string, channelAccessToken as string, pData as any)
-
             const userDocRef = db.collection('users').doc(userId)
             fst.getUserActiveParcels(userDocRef)
                 .then(activeParcels => {
