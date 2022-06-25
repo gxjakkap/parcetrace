@@ -254,7 +254,7 @@ app.get('/getparceldata', (req: Request, res: Response) => {
 })
 
 //parcel delete method
-app.delete('/parcelrem', (req: Request, res: Response) => {
+app.post('/parcelrem', (req: Request, res: Response) => {
     //check for api key
     if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" })
