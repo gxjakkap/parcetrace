@@ -52,7 +52,7 @@
     async function parcelRecieved(parcelId: string | null) {
         loadingStateAfterSubmit = true;
         return fetch(`https://${apiUrl}/parcelrem`, {
-            method: "DELETE",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 authorization: apikey,
