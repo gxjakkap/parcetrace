@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import fs from 'fs'
@@ -8,6 +8,7 @@ import cors from 'cors'
 import crypto from 'crypto'
 import * as fst from './firestoreoperation'
 import * as msg from './message'
+import { isFunctionOrConstructorTypeNode } from 'typescript'
 
 //set port
 const port = process.env.port || 3000
@@ -45,6 +46,10 @@ const corsOption = {
 //use cors middleware
 app.use(cors(corsOption))
 
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack)
+    res.status(500).json({ status: 500, message: "An error occured!" })
+})
 
 //webhook path
 app.post('/webhook', (req: Request, res: Response) => {
