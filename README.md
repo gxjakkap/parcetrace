@@ -1,6 +1,6 @@
 # Parcetrace
 
-A solution for Condominium juristic person for notifying tenants about their package/parcel arrival. (Hence Parcel+Trace = Parcetrace)
+A solution for Condominium juristic person for notifying tenants about their package/parcel arrival. (Parcel+Trace = Parcetrace)
 
 *This project is my school project for STEM Project 2022. This may or may not be discontinued after I passed this class.*
 
