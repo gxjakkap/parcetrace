@@ -95,6 +95,7 @@ app.post('/parcelreg', (req: Request, res: Response) => {
     let body: any
     try {
         body = req.body
+        if (!body.sender || !body.location || !body.userId) throw Error('value missing')
     }
     catch (err) {
         console.log(err)
@@ -181,6 +182,10 @@ app.get('/getUserId', (req: Request, res: Response) => {
         console.log('Unauthorized request recieved')
         return
     }
+    if (!req.query.phoneNo) {
+        res.status(400).json({ status: 400, message: 'bad request' })
+        return
+    }
     const phoneNumber = req.query.phoneNo as string
     const collectionRef = db.collection('users')
     fst.findUserWithPhoneNumber(collectionRef, phoneNumber)
@@ -210,6 +215,10 @@ app.get('/parcelcheck', (req: Request, res: Response) => {
         console.log('Unauthorized request recieved')
         return
     }
+    if (!req.query.userId) {
+        res.status(400).json({ status: 400, message: 'bad request' })
+        return
+    }
     const userId = req.query.userId as string
     const docRef = db.collection('users').doc(userId)
     fst.getUserActiveParcels(docRef)
@@ -234,6 +243,10 @@ app.get('/getparceldata', (req: Request, res: Response) => {
     if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" })
         console.log('Unauthorized request recieved')
+        return
+    }
+    if (!req.query.parcelId) {
+        res.status(400).json({ status: 400, message: 'bad request' })
         return
     }
     const parcelId = req.query.parcelId as string

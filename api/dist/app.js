@@ -112,6 +112,8 @@ app.post('/parcelreg', (req, res) => {
     let body;
     try {
         body = req.body;
+        if (!body.sender || !body.location || !body.userId)
+            throw Error('value missing');
     }
     catch (err) {
         console.log(err);
@@ -195,6 +197,10 @@ app.get('/getUserId', (req, res) => {
         console.log('Unauthorized request recieved');
         return;
     }
+    if (!req.query.phoneNo) {
+        res.status(400).json({ status: 400, message: 'bad request' });
+        return;
+    }
     const phoneNumber = req.query.phoneNo;
     const collectionRef = db.collection('users');
     fst.findUserWithPhoneNumber(collectionRef, phoneNumber)
@@ -223,6 +229,10 @@ app.get('/parcelcheck', (req, res) => {
         console.log('Unauthorized request recieved');
         return;
     }
+    if (!req.query.userId) {
+        res.status(400).json({ status: 400, message: 'bad request' });
+        return;
+    }
     const userId = req.query.userId;
     const docRef = db.collection('users').doc(userId);
     fst.getUserActiveParcels(docRef)
@@ -246,6 +256,10 @@ app.get('/getparceldata', (req, res) => {
     if (req.headers.authorization !== process.env.API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
+        return;
+    }
+    if (!req.query.parcelId) {
+        res.status(400).json({ status: 400, message: 'bad request' });
         return;
     }
     const parcelId = req.query.parcelId;
