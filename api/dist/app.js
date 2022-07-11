@@ -63,6 +63,7 @@ const corsOption = {
 };
 //use cors middleware
 app.use((0, cors_1.default)(corsOption));
+//error handling
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ status: 500, message: "An error occured!" });

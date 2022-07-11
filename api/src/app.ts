@@ -8,7 +8,6 @@ import cors from 'cors'
 import crypto from 'crypto'
 import * as fst from './firestoreoperation'
 import * as msg from './message'
-import { isFunctionOrConstructorTypeNode } from 'typescript'
 
 //set port
 const port = process.env.port || 3000
