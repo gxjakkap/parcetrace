@@ -154,5 +154,10 @@ export const getParcelDataFromAllParcel = async (ref: FirebaseFirestore.Document
     return doc.exists ? doc.data() : null
 }
 
+export const checkForRegistrationEligibility = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+    const doc = await ref.get()
+    return (doc.exists && doc.data()?.isRegistered == false)
+}
+
 export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber }
 export type { userParcel, allParcel, userData }
