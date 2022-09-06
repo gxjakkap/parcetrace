@@ -1,5 +1,4 @@
-interface friends {
-    userId: string,
+interface lineData {
     displayName: string,
     picLink: string
 }
@@ -21,12 +20,32 @@ interface allParcel {
     userId: string,
 }
 
+interface userDataPreRegis {
+    userId: string,
+    lineData: lineData,
+    isRegistered: boolean,
+    name?: string,
+    surname?: string,
+    room?: string,
+    phoneNumber?: string
+}
+
 interface userData {
     userId: string,
+    lineData: lineData,
+    isRegistered: true,
     name: string,
     surname: string,
     room: string,
     phoneNumber: string
+}
+
+interface userRegistrationData {
+    userId: string,
+    name: string,
+    surname: string,
+    phoneNumber: string,
+    room: string
 }
 
 interface findUserWithPhoneNumberResponse {
@@ -36,7 +55,7 @@ interface findUserWithPhoneNumberResponse {
     userId?: string
 }
 
-export const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: friends) => {
+export const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: userDataPreRegis) => {
     await ref.set(data)
 }
 
@@ -44,8 +63,7 @@ export const dbRemoveDoc = async (ref: FirebaseFirestore.DocumentReference<Fireb
     await ref.delete()
 }
 
-export const dbRemoveOnUnfollow = async (friendDocRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, userDocRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
-    await friendDocRef.delete()
+export const dbRemoveOnUnfollow = async (userDocRef: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
     const userDoc = await userDocRef.get()
     if (userDoc.exists) {
         await userDocRef.delete()
@@ -71,8 +89,17 @@ export const dbRemoveParcelFromUserData = async (userRef: FirebaseFirestore.Docu
     }
 }
 
-export const dbSetOnUserRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: userData) => {
-    await ref.set(data)
+export const dbSetOnUserRegister = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: userRegistrationData) => {
+    let userData = await ref.get()
+    if (userData.exists) {
+        let userDataObj = userData.data() as userDataPreRegis
+        userDataObj.name = data.name
+        userDataObj.surname = data.surname
+        userDataObj.phoneNumber = data.phoneNumber
+        userDataObj.room = data.room
+        userDataObj.isRegistered = true
+        await ref.update(userDataObj)
+    }
 }
 
 export const checkIfDocumentExist = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
@@ -127,5 +154,10 @@ export const getParcelDataFromAllParcel = async (ref: FirebaseFirestore.Document
     return doc.exists ? doc.data() : null
 }
 
+export const checkForRegistrationEligibility = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
+    const doc = await ref.get()
+    return (doc.exists && doc.data()?.isRegistered == false)
+}
+
 export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber }
-export type { friends, userParcel, allParcel, userData }
+export type { userParcel, allParcel, userData }
