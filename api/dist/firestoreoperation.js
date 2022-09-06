@@ -18,8 +18,7 @@ const dbRemoveDoc = (ref) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.delete();
 });
 exports.dbRemoveDoc = dbRemoveDoc;
-const dbRemoveOnUnfollow = (friendDocRef, userDocRef) => __awaiter(void 0, void 0, void 0, function* () {
-    yield friendDocRef.delete();
+const dbRemoveOnUnfollow = (userDocRef) => __awaiter(void 0, void 0, void 0, function* () {
     const userDoc = yield userDocRef.get();
     if (userDoc.exists) {
         yield userDocRef.delete();
@@ -48,7 +47,16 @@ const dbRemoveParcelFromUserData = (userRef, parcelId) => __awaiter(void 0, void
 });
 exports.dbRemoveParcelFromUserData = dbRemoveParcelFromUserData;
 const dbSetOnUserRegister = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
-    yield ref.set(data);
+    let userData = yield ref.get();
+    if (userData.exists) {
+        let userDataObj = userData.data();
+        userDataObj.name = data.name;
+        userDataObj.surname = data.surname;
+        userDataObj.phoneNumber = data.phoneNumber;
+        userDataObj.room = data.room;
+        userDataObj.isRegistered = true;
+        yield ref.update(userDataObj);
+    }
 });
 exports.dbSetOnUserRegister = dbSetOnUserRegister;
 const checkIfDocumentExist = (ref) => __awaiter(void 0, void 0, void 0, function* () {

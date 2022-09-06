@@ -41,7 +41,7 @@ const port = process.env.port || 3000;
 //get credentials path
 const firebaseCredPath = process.env.cred;
 //init firestore
-const serviceAccount = require(firebaseCredPath);
+const serviceAccount = require('D:/Downloads/parcetrace-test-39d2b0dc2602.json');
 (0, app_1.initializeApp)({
     credential: (0, app_1.cert)(serviceAccount)
 });
@@ -52,6 +52,7 @@ const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.gunt
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate };
 //get line credentials
 const channelAccessToken = process.env.CAT;
+const API_KEY = process.env.API_KEY;
 //init express app
 const app = (0, express_1.default)();
 //use json middleware
@@ -79,7 +80,6 @@ app.post('/webhook', (req, res) => {
             *   - send greeting message
             */
             if (body.events[i].type === 'follow') {
-                console.log(body.events[i].source.userId);
                 axios_1.default.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`, {
                     headers: {
                         Authorization: `Bearer ${channelAccessToken}`
@@ -87,8 +87,8 @@ app.post('/webhook', (req, res) => {
                 })
                     .then(data => {
                     msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken, data.data.displayName).catch(err => { console.log(err); });
-                    const docRef = db.collection('friends').doc(body.events[i].source.userId);
-                    fst.dbSetOnFollow(docRef, { userId: data.data.userId, displayName: data.data.displayName, picLink: data.data.pictureUrl }).catch(err => { console.log(err); });
+                    const docRef = db.collection('users').doc(body.events[i].source.userId);
+                    fst.dbSetOnFollow(docRef, { userId: data.data.userId, lineData: { displayName: data.data.displayName, picLink: data.data.pictureUrl }, isRegistered: false }).catch(err => { console.log(err); });
                 });
             }
             /*
@@ -97,9 +97,8 @@ app.post('/webhook', (req, res) => {
             *   - remove user from user collection
             */
             else if (body.events[i].type === 'unfollow') {
-                const friendDocRef = db.collection('friends').doc(body.events[i].source.userId);
                 const userDocRef = db.collection('users').doc(body.events[i].source.userId);
-                fst.dbRemoveOnUnfollow(friendDocRef, userDocRef).catch(err => { console.log(err); });
+                fst.dbRemoveOnUnfollow(userDocRef).catch(err => { console.log(err); });
             }
         }
     }
@@ -110,7 +109,7 @@ app.post('/webhook', (req, res) => {
 //parcel register path
 app.post('/parcelreg', (req, res) => {
     //check for api key
-    if (req.headers.authorization !== process.env.API_KEY) {
+    if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ error: 'unauthorized' });
         return;
     }
@@ -141,7 +140,7 @@ app.post('/parcelreg', (req, res) => {
 app.post('/userreg', (req, res) => {
     //TODO: remove console.log
     //check for api key
-    if (req.headers.authorization !== process.env.API_KEY) {
+    if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
         return;
@@ -159,17 +158,13 @@ app.post('/userreg', (req, res) => {
         console.log(err);
         return;
     }
-    const friendDocRef = db.collection('friends').doc(data.userId);
-    fst.checkIfDocumentExist(friendDocRef)
+    const docRef = db.collection('users').doc(data.userId);
+    fst.checkIfDocumentExist(docRef)
         .then(eligible => {
         if (eligible) {
             const userDocRef = db.collection('users').doc(data.userId);
             fst.checkIfDocumentExist(userDocRef).then(exist => {
                 if (exist) {
-                    res.status(409).json({ status: 409, message: "User already exists" });
-                    console.log('User already exists');
-                }
-                else {
                     fst.dbSetOnUserRegister(userDocRef, data)
                         .then(() => {
                         console.log('user registered');
@@ -187,6 +182,9 @@ app.post('/userreg', (req, res) => {
                         res.status(500).json({ status: 500, message: "Internal Server Error" });
                     });
                 }
+                else {
+                    res.status(401).json({ status: 401, message: "User is not a friend yet!" });
+                }
             });
         }
         else {
@@ -197,7 +195,7 @@ app.post('/userreg', (req, res) => {
 });
 //get user id
 app.get('/getUserId', (req, res) => {
-    if (req.headers.authorization !== process.env.API_KEY) {
+    if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
         return;
@@ -229,7 +227,7 @@ app.get('/getUserId', (req, res) => {
 });
 app.get('/parcelcheck', (req, res) => {
     //check for api key
-    if (req.headers.authorization !== process.env.API_KEY) {
+    if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
         return;
@@ -258,7 +256,7 @@ app.get('/parcelcheck', (req, res) => {
 });
 app.get('/getparceldata', (req, res) => {
     //check for api key
-    if (req.headers.authorization !== process.env.API_KEY) {
+    if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
         return;
@@ -286,7 +284,7 @@ app.get('/getparceldata', (req, res) => {
 //parcel delete method
 app.post('/parcelrem', (req, res) => {
     //check for api key
-    if (req.headers.authorization !== process.env.API_KEY) {
+    if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" });
         console.log('Unauthorized request recieved');
         return;
