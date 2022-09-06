@@ -1,11 +1,17 @@
 <script lang="ts">
-	import "../app.css";
+  import "../app.css";
 </script>
 
 <main>
-	<slot />
+  <slot />
 </main>
 
 <footer class="w-screen text-center">
-	<p class="text-black dark:text-white fixed inset-x-0 bottom-0">I'm a placeholder for footer text!</p>
+  <p class="text-black dark:text-white fixed inset-x-0 bottom-0">
+    © 2022 - Parcetrace <br /><a
+      href="https://raw.githubusercontent.com/gxjakkap/parcetrace/main/COPYING"
+      target="_blank"
+      rel="noreferer">Licensed under GPL-3.0-only</a
+    >
+  </p>
 </footer>
