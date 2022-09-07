@@ -78,10 +78,6 @@
       .then((res) => {
         if (res.status === 200) {
           location.replace("/regis/success");
-        } else if (res.status === 409) {
-          toggleModal();
-          modalState.title = "Error";
-          modalState.message = "คุณได้ลงทะเบียนไปแล้ว";
         } else if (res.status === 500) {
           toggleModal();
           modalState.title = "Error";
@@ -90,7 +86,8 @@
         } else if (res.status === 403) {
           toggleModal();
           modalState.title = "Error";
-          modalState.message = "คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace!";
+          modalState.message =
+            "คุณยังไม่ได้เป็นเพื่อนกับบอท Parcetrace หรือคุณได้ลงทะเบียนไปแล้ว";
         } else {
           toggleModal();
           modalState.title = "Error";
