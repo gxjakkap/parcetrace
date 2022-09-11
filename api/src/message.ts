@@ -1,10 +1,11 @@
 import axios from 'axios'
-import { TextMessage } from '@line/bot-sdk'
+import { Message, TemplateMessage, TextMessage } from '@line/bot-sdk'
 import { userData, userParcel, allParcel } from './firestoreoperation'
 
 const baseUrl = 'https://parcetrace.vercel.app/'
+const parcelPlaceholder = 'https://firebasestorage.googleapis.com/v0/b/parcetrace.appspot.com/o/parcelplaceholder.jpg?alt=media&token=41e47102-a5e0-4308-a7c0-b3642293d1ce'
 
-async function sendMessage(message: TextMessage, channelAccessToken: string, userId: string) {
+async function sendMessage(message: Message, channelAccessToken: string, userId: string) {
     const headers = { 'Authorization': `Bearer ${channelAccessToken}`, 'Content-Type': 'application/json' }
     const body = {
         to: userId,
@@ -36,6 +37,34 @@ export async function sendGreetingMessage(userId: string, channelAccessToken: st
 
 export async function sendParcelNotificationMessage(userId: string, channelAccessToken: string, parcelData: userParcel) {
     const message: TextMessage = { type: 'text', text: `🔔 กิ๊งก่อง มีพัสดุมาส่งค้าบ📦\n\nผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}\n\nกดที่ลิ้งนี้เพื่อยืนยันการรับพัสดุหลังจากได้ลงไปรับพัสดุแล้ว\n${baseUrl}confirmation?pid=${parcelData.parcelId}` }
+    return sendMessage(message, channelAccessToken, userId)
+}
+
+export async function sendParcelNotificationMessageNew(userId: string, channelAccessToken: string, parcelData: userParcel) {
+    const message: TemplateMessage = {
+        "type": "template",
+        "altText": "การแจ้งเตือนพัสดุ",
+        "template": {
+          "type": "buttons",
+          "imageAspectRatio": "rectangle",
+          "imageSize": "cover",
+          "imageBackgroundColor": "#FFFFFF",
+          "title": "คุณมีพัสดุมาส่ง!",
+          "text": "ผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}",
+          "actions": [
+            {
+              "type": "uri",
+              "label": "ยืนยันการรับพัสดุ",
+              "uri": `${baseUrl}confirmation?pid=${parcelData.parcelId}`
+            },
+            {
+                "type": "uri",
+                "label": "ดูรูปภาพพัสดุ",
+                "uri": `${parcelPlaceholder}`
+              }
+          ]
+        }
+      }
     return sendMessage(message, channelAccessToken, userId)
 }
 

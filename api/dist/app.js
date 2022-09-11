@@ -132,7 +132,7 @@ app.post('/parcelreg', (req, res) => {
     const allActiveRef = db.collection('allActiveParcel').doc(randomUUID);
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
         .then(() => {
-        msg.sendParcelNotificationMessage(body.userId, channelAccessToken, dataForUser);
+        msg.sendParcelNotificationMessageNew(body.userId, channelAccessToken, dataForUser);
         res.status(200).json({ status: 200, message: 'Parcel registered' });
     })
         .catch(err => { console.log(err); res.status(500).json({ status: 500, message: 'Internal Server Error' }); return; });
@@ -159,39 +159,6 @@ app.post('/userreg', (req, res) => {
         return;
     }
     const docRef = db.collection('users').doc(data.userId);
-    /* fst.checkIfDocumentExist(docRef)
-        .then(eligible => {
-            if (eligible) {
-                const userDocRef = db.collection('users').doc(data.userId)
-                fst.checkIfDocumentExist(userDocRef).then(exist => {
-                    if (exist) {
-                        fst.dbSetOnUserRegister(userDocRef, data)
-                        .then(() => {
-                            console.log('user registered')
-                            msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
-                                .then(() => {
-                                    console.log('user notified about a successful registration')
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                })
-                            res.status(200).json({ status: 200, message: "User registered" })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            res.status(500).json({ status: 500, message: "Internal Server Error" })
-                        })
-                    }
-                    else {
-                        res.status(401).json({ status: 401, message: "User is not a friend yet!" })
-                    }
-                })
-            }
-            else {
-                res.status(403).json({ status: 403, message: "Forbidden" })
-                console.log('Forbidden request recieved')
-            }
-        }) */
     fst.checkForRegistrationEligibility(docRef)
         .then(eligible => {
         if (eligible) {

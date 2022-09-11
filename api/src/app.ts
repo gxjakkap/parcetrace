@@ -115,7 +115,7 @@ app.post('/parcelreg', (req: Request, res: Response) => {
     const allActiveRef = db.collection('allActiveParcel').doc(randomUUID as string)
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
         .then(() => {
-            msg.sendParcelNotificationMessage(body.userId, channelAccessToken as string, dataForUser)
+            msg.sendParcelNotificationMessageNew(body.userId, channelAccessToken as string, dataForUser)
             res.status(200).json({ status: 200, message: 'Parcel registered' })
         })
         .catch(err => { console.log(err); res.status(500).json({ status: 500, message: 'Internal Server Error' }); return })
@@ -144,64 +144,30 @@ app.post('/userreg', (req: Request, res: Response) => {
         return
     }
     const docRef = db.collection('users').doc(data.userId)
-    /* fst.checkIfDocumentExist(docRef)
+    fst.checkForRegistrationEligibility(docRef)
         .then(eligible => {
-            if (eligible) {
-                const userDocRef = db.collection('users').doc(data.userId)
-                fst.checkIfDocumentExist(userDocRef).then(exist => {
-                    if (exist) {
-                        fst.dbSetOnUserRegister(userDocRef, data)
-                        .then(() => {
-                            console.log('user registered')
-                            msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
-                                .then(() => {
-                                    console.log('user notified about a successful registration')
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                })
-                            res.status(200).json({ status: 200, message: "User registered" })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            res.status(500).json({ status: 500, message: "Internal Server Error" })
-                        })
-                    }
-                    else {
-                        res.status(401).json({ status: 401, message: "User is not a friend yet!" })
-                    }
-                })
+            if (eligible){
+                fst.dbSetOnUserRegister(docRef, data)
+                    .then(() => {
+                        console.log('user registered')
+                        msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
+                            .then(() => {
+                                console.log('user notified about a successful registration')
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
+                        res.status(200).json({ status: 200, message: "User registered" })
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        res.status(500).json({ status: 500, message: "Internal Server Error" })
+                    })
             }
             else {
-                res.status(403).json({ status: 403, message: "Forbidden" })
-                console.log('Forbidden request recieved')
+                res.status(403).json({ status: 403, message: "Forbidden. Either user isn't a friend yet or user is already registered." }) 
             }
-        }) */
-
-        fst.checkForRegistrationEligibility(docRef)
-            .then(eligible => {
-                if (eligible){
-                    fst.dbSetOnUserRegister(docRef, data)
-                        .then(() => {
-                            console.log('user registered')
-                            msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
-                                .then(() => {
-                                    console.log('user notified about a successful registration')
-                                })
-                                .catch(err => {
-                                    console.log(err)
-                                })
-                            res.status(200).json({ status: 200, message: "User registered" })
-                        })
-                        .catch(err => {
-                            console.log(err)
-                            res.status(500).json({ status: 500, message: "Internal Server Error" })
-                        })
-                }
-                else {
-                    res.status(403).json({ status: 403, message: "Forbidden. Either user isn't a friend yet or user is already registered." }) 
-                }
-            })
+        })
 })
 
 //get user id

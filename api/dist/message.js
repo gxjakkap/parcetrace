@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendParcelNotificationMessage = exports.sendGreetingMessage = exports.sendRegistrationConfirmMessage = void 0;
+exports.sendParcelNotificationMessageNew = exports.sendParcelNotificationMessage = exports.sendGreetingMessage = exports.sendRegistrationConfirmMessage = void 0;
 const axios_1 = __importDefault(require("axios"));
 const baseUrl = 'https://parcetrace.vercel.app/';
+const parcelPlaceholder = 'https://firebasestorage.googleapis.com/v0/b/parcetrace.appspot.com/o/parcelplaceholder.jpg?alt=media&token=41e47102-a5e0-4308-a7c0-b3642293d1ce';
 function sendMessage(message, channelAccessToken, userId) {
     return __awaiter(this, void 0, void 0, function* () {
         const headers = { 'Authorization': `Bearer ${channelAccessToken}`, 'Content-Type': 'application/json' };
@@ -56,4 +57,34 @@ function sendParcelNotificationMessage(userId, channelAccessToken, parcelData) {
     });
 }
 exports.sendParcelNotificationMessage = sendParcelNotificationMessage;
+function sendParcelNotificationMessageNew(userId, channelAccessToken, parcelData) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const message = {
+            "type": "template",
+            "altText": "การแจ้งเตือนพัสดุ",
+            "template": {
+                "type": "buttons",
+                "imageAspectRatio": "rectangle",
+                "imageSize": "cover",
+                "imageBackgroundColor": "#FFFFFF",
+                "title": "คุณมีพัสดุมาส่ง!",
+                "text": "ผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}",
+                "actions": [
+                    {
+                        "type": "uri",
+                        "label": "ยืนยันการรับพัสดุ",
+                        "uri": `${baseUrl}confirmation?pid=${parcelData.parcelId}`
+                    },
+                    {
+                        "type": "uri",
+                        "label": "ดูรูปภาพพัสดุ",
+                        "uri": `${parcelPlaceholder}`
+                    }
+                ]
+            }
+        };
+        return sendMessage(message, channelAccessToken, userId);
+    });
+}
+exports.sendParcelNotificationMessageNew = sendParcelNotificationMessageNew;
 exports.default = { sendRegistrationConfirmMessage, sendGreetingMessage, sendParcelNotificationMessage };
