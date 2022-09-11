@@ -50,7 +50,7 @@ export async function sendParcelNotificationMessageNew(userId: string, channelAc
           "imageSize": "cover",
           "imageBackgroundColor": "#FFFFFF",
           "title": "คุณมีพัสดุมาส่ง!",
-          "text": "ผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}",
+          "text": `ผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}`,
           "actions": [
             {
               "type": "uri",

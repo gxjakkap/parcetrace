@@ -68,7 +68,7 @@ function sendParcelNotificationMessageNew(userId, channelAccessToken, parcelData
                 "imageSize": "cover",
                 "imageBackgroundColor": "#FFFFFF",
                 "title": "คุณมีพัสดุมาส่ง!",
-                "text": "ผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}",
+                "text": `ผู้ส่ง: ${parcelData.sender}\nจุดรับพัสดุ: ${parcelData.location}`,
                 "actions": [
                     {
                         "type": "uri",
