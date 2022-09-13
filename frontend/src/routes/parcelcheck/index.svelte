@@ -50,6 +50,7 @@
             } else {
                 console.log(res);
                 toggleModal();
+                loadingState = false;
                 modalState.title = "Error";
                 modalState.message = "เกิดข้อผิดพลาดบางอย่าง ลองอีกครั้ง";
             }
