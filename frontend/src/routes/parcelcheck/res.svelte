@@ -25,9 +25,21 @@
     parcelId: string;
   }
 
+  interface userData {
+    name: string;
+    surname: string;
+  }
+
+  interface lineData {
+    displayName: string;
+    picLink: string;
+  }
+
   interface responsedata {
     status: number;
     parcels: parcels[];
+    userData: userData;
+    lineData: lineData;
   }
 
   //get userId params from url (https://domain.ext/parcecheck?userId="userId")
@@ -69,7 +81,7 @@
     return epdate.toLocaleDateString("th-TH", {
       year: "numeric",
       month: "short",
-      day: "numeric",
+      day: "2-digit",
       hour: "numeric",
       minute: "numeric",
     });
@@ -84,12 +96,17 @@
   {#await waitforData()}
     <Loading />
   {:then data}
-    <h1
-      class="font-Prompt text-black dark:text-white text-center text-4xl px-3 mb-5 mt-5"
-    >
-      พัสดุของคุณ
-    </h1>
     {#if data.parcels.length >= 1}
+      <h1
+        class="font-Prompt text-black dark:text-white text-center text-4xl mb-1 mt-5"
+      >
+        พัสดุของคุณ
+      </h1>
+      <h3
+        class="font-Prompt text-black dark:text-white text-center text-2xl pb-3 mb-5 mt-3"
+      >
+        {`${data.userData.name} ${data.userData.surname} (${data.lineData.displayName})`}
+      </h3>
       <div class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3">
         <table
           class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
@@ -100,7 +117,10 @@
             <tr>
               <th scope="col" class="font-Prompt px-6 py-3"> วันที่ </th>
               <th scope="col" class="font-Prompt px-6 py-3"> พัสดุจาก </th>
-              <th scope="col" class="font-Prompt px-6 py-3"> สถานะ </th>
+              <th scope="col" class="font-Prompt px-6 py-3">
+                สถานะ / จุดรับ
+              </th>
+              <th scope="col" class="font-Prompt px-6 py-3"> ยืนยัน </th>
             </tr>
           </thead>
           <tbody>
@@ -110,7 +130,7 @@
               >
                 <th
                   scope="row"
-                  class="font-Prompt px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
+                  class="font-Prompt px-4 py-4 font-medium text-gray-900 dark:text-white whitespace-pre-wrap break-normal"
                 >
                   {localeDateString(d.date)}
                 </th>
@@ -124,6 +144,15 @@
                 {:else}
                   <Lost />
                 {/if}
+                <td
+                  class="font-Prompt text-gray-900 dark:text-white hover:text-blue-500 underline px-6 py-4"
+                >
+                  <a
+                    href={`https://parcetrace.vercel.app/confirmation?pid=${d.parcelId}`}
+                    rel="noreferer"
+                    target="_blank">ยืนยันการรับ</a
+                  >
+                </td>
               </tr>
             {/each}
           </tbody>
