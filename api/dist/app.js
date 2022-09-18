@@ -230,14 +230,22 @@ app.get('/parcelcheck', (req, res) => {
     const userId = req.query.userId;
     const docRef = db.collection('users').doc(userId);
     fst.getUserActiveParcels(docRef)
-        .then(activeParcels => {
-        if (activeParcels.length > 0) {
-            console.log('active parcels found');
-            res.status(200).json({ status: 200, parcels: activeParcels });
+        .then(data => {
+        /* if (activeParcels.length > 0) {
+            console.log('active parcels found')
+            res.status(200).json({ status: 200, parcels: activeParcels })
         }
         else {
-            console.log('no active parcels found');
-            res.status(200).json({ status: 200, parcels: [] });
+            console.log('no active parcels found')
+            res.status(200).json({ status: 200, parcels: [] })
+        } */
+        if (data || (data !== undefined || data !== null)) {
+            if ((data === null || data === void 0 ? void 0 : data.activeParcel.length) > 0) {
+                res.status(200).json({ status: 200, parcels: data === null || data === void 0 ? void 0 : data.activeParcel, userData: data === null || data === void 0 ? void 0 : data.userData, lineData: data === null || data === void 0 ? void 0 : data.lineData });
+            }
+            else {
+                res.status(200).json({ status: 200, parcels: [], userData: data === null || data === void 0 ? void 0 : data.userData, lineData: data === null || data === void 0 ? void 0 : data.lineData });
+            }
         }
     })
         .catch(err => {
@@ -305,8 +313,8 @@ app.post('/parcelrem', (req, res) => {
         const userId = pData.userId;
         const userDocRef = db.collection('users').doc(userId);
         fst.getUserActiveParcels(userDocRef)
-            .then(activeParcels => {
-            if (activeParcels.length > 0) {
+            .then(returnedData => {
+            if ((returnedData === null || returnedData === void 0 ? void 0 : returnedData.activeParcel.length) > 0) {
                 fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId));
                 fst.dbRemoveParcelFromUserData(userDocRef, data.parcelId);
                 res.status(200).json({ status: 200, message: "Parcel deleted" });

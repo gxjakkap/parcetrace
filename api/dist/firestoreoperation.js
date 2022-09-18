@@ -97,13 +97,21 @@ const findUserWithPhoneNumber = (collection, phoneNumber) => __awaiter(void 0, v
 });
 exports.findUserWithPhoneNumber = findUserWithPhoneNumber;
 const getUserActiveParcels = (ref) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c, _d;
     const doc = yield ref.get();
     if (doc.exists) {
-        return (((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.activeParcel) !== undefined) ? (_d = doc.data()) === null || _d === void 0 ? void 0 : _d.activeParcel : [];
+        //return (doc.data()?.activeParcel !== undefined) ? doc.data()?.activeParcel : []
+        const data = doc.data();
+        return {
+            userData: {
+                name: ((data === null || data === void 0 ? void 0 : data.name) !== undefined) ? data === null || data === void 0 ? void 0 : data.name : "undefined",
+                surname: ((data === null || data === void 0 ? void 0 : data.surname) !== undefined) ? data === null || data === void 0 ? void 0 : data.surname : "undefined"
+            },
+            lineData: ((data === null || data === void 0 ? void 0 : data.lineData) !== undefined) ? data === null || data === void 0 ? void 0 : data.lineData : {},
+            activeParcel: ((data === null || data === void 0 ? void 0 : data.activeParcel) !== undefined) ? data === null || data === void 0 ? void 0 : data.activeParcel : []
+        };
     }
     else {
-        return [];
+        return null;
     }
 });
 exports.getUserActiveParcels = getUserActiveParcels;
@@ -113,9 +121,9 @@ const getParcelDataFromAllParcel = (ref) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.getParcelDataFromAllParcel = getParcelDataFromAllParcel;
 const checkForRegistrationEligibility = (ref) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e;
+    var _c;
     const doc = yield ref.get();
-    return (doc.exists && ((_e = doc.data()) === null || _e === void 0 ? void 0 : _e.isRegistered) == false);
+    return (doc.exists && ((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.isRegistered) == false);
 });
 exports.checkForRegistrationEligibility = checkForRegistrationEligibility;
 exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveOnUnfollow, dbRemoveDoc: exports.dbRemoveDoc, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister, getParcelDataFromAllParcel: exports.getParcelDataFromAllParcel, getUserActiveParcels: exports.getUserActiveParcels, checkIfDocumentExist: exports.checkIfDocumentExist, findUserWithPhoneNumber: exports.findUserWithPhoneNumber };

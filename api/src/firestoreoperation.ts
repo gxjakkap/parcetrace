@@ -142,10 +142,19 @@ export const findUserWithPhoneNumber = async (collection: FirebaseFirestore.Coll
 export const getUserActiveParcels = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
     const doc = await ref.get()
     if (doc.exists) {
-        return (doc.data()?.activeParcel !== undefined) ? doc.data()?.activeParcel : []
+        //return (doc.data()?.activeParcel !== undefined) ? doc.data()?.activeParcel : []
+        const data = doc.data()
+        return {
+            userData: {
+                name: (data?.name !== undefined) ? data?.name : "undefined", 
+                surname: (data?.surname !== undefined) ? data?.surname : "undefined"
+            },
+            lineData: (data?.lineData !== undefined) ? data?.lineData : {},
+            activeParcel: (data?.activeParcel !== undefined) ? data?.activeParcel : []
+        }
     }
     else {
-        return []
+        return null
     }
 }
 

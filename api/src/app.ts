@@ -217,14 +217,22 @@ app.get('/parcelcheck', (req: Request, res: Response) => {
     const userId = req.query.userId as string
     const docRef = db.collection('users').doc(userId)
     fst.getUserActiveParcels(docRef)
-        .then(activeParcels => {
-            if (activeParcels.length > 0) {
+        .then(data => {
+            /* if (activeParcels.length > 0) {
                 console.log('active parcels found')
                 res.status(200).json({ status: 200, parcels: activeParcels })
             }
             else {
                 console.log('no active parcels found')
                 res.status(200).json({ status: 200, parcels: [] })
+            } */
+            if (data || (data !== undefined || data !== null)){
+                if (data?.activeParcel.length > 0){
+                    res.status(200).json({ status: 200, parcels: data?.activeParcel, userData: data?.userData, lineData: data?.lineData })
+                }
+                else {
+                    res.status(200).json({ status: 200, parcels: [], userData: data?.userData, lineData: data?.lineData })
+                }
             }
         })
         .catch(err => {
@@ -296,8 +304,8 @@ app.post('/parcelrem', (req: Request, res: Response) => {
             const userId = pData.userId
             const userDocRef = db.collection('users').doc(userId)
             fst.getUserActiveParcels(userDocRef)
-                .then(activeParcels => {
-                    if (activeParcels.length > 0) {
+                .then(returnedData => {
+                    if (returnedData?.activeParcel.length > 0) {
                         fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId))
                         fst.dbRemoveParcelFromUserData(userDocRef, data.parcelId)
                         res.status(200).json({ status: 200, message: "Parcel deleted" })
