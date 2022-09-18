@@ -260,10 +260,6 @@ app.get('/allparcellist', (req, res) => {
         console.log('Unauthorized request recieved');
         return;
     }
-    if (!req.query.userId) {
-        res.status(400).json({ status: 400, message: 'bad request' });
-        return;
-    }
     const colRef = db.collection('allActiveParcel');
     fst.getAllParcel(colRef)
         .then((data) => {
