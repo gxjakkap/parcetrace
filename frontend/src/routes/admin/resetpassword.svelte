@@ -1,15 +1,10 @@
 <script lang="ts">
   import { browser } from "$app/env";
-  import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+  import { getAuth, sendPasswordResetEmail } from "firebase/auth";
   import { initializeApp } from "firebase/app";
   import { FIREBASE_CONFIG } from "$lib/env";
   import { onMount } from "svelte";
   import Modal from "$lib/modal.svelte";
-
-  interface credentials {
-    email: string;
-    password: string;
-  }
 
   interface firebaseConfig {
     apiKey?: string;
@@ -33,8 +28,7 @@
   } else {
     firebaseConfig = FIREBASE_CONFIG;
   }
-
-  const credentials: credentials = { email: "", password: "" };
+  let email: string;
   let auth: any;
   let app: any;
   try {
@@ -56,7 +50,6 @@
 
   const firebaseErrorMap: any = {
     "auth/user-not-found": "User Not Found!",
-    "auth/wrong-password": "Wrong Email/Password",
   };
 
   onMount(() => {
@@ -73,25 +66,24 @@
   });
 
   async function onSubmit() {
-    if (!credentials.email || !credentials.password) {
+    if (!email) {
       toggleModal();
       modalState.title = "Error";
       modalState.message = "กรุณากรอกข้อมูลให้ครบถ้วน";
       return;
     }
-    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(credentials.email)) {
+    if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
       toggleModal();
       modalState.title = "Error";
       modalState.message = "อีเมลไม่ถูกต้อง";
       return;
     }
 
-    signInWithEmailAndPassword(auth, credentials.email, credentials.password)
-      .then((userCred) => {
-        //TODO: implement login success
-        localStorage.setItem("ptracecr", JSON.stringify(userCred));
-        location.replace("/admin/parcellist");
-        console.log(userCred);
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        toggleModal();
+        modalState.title = "Success";
+        modalState.message = `ส่งอีเมลรีเซ็ตรหัสผ่านไปที่ ${email} แล้ว`;
       })
       .catch((error) => {
         toggleModal();
@@ -123,33 +115,21 @@
       <h1
         class="font-Prompt mb-8 text-3xl text-center text-black dark:text-white"
       >
-        ลงชื่อเข้าใช้สู่ Admin Panel
+        รีเซ็ตรหัสผ่าน
       </h1>
 
       <input
         type="text"
         class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
         placeholder="example@parcetrace.app"
-        bind:value={credentials.email}
-      />
-
-      <input
-        type="password"
-        class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
-        placeholder="Password"
-        bind:value={credentials.password}
+        bind:value={email}
       />
 
       <button
         type="submit"
         class="font-Prompt w-full text-center py-3 rounded bg-green-500 text-white hover:bg-green-700 focus:outline-none my-1"
-        on:click={onSubmit}>Login</button
+        on:click={onSubmit}>Submit</button
       >
-      <h3
-        class="font-Prompt text-black dark:text-white hover:text-blue-500 underline text-center text-lg mt-3"
-      >
-        <a href={"/admin/resetpassword"}>ลืมรหัสผ่าน?</a>
-      </h3>
     </div>
   </div>
 </div>
