@@ -47,9 +47,18 @@
                         "/parcelcheck/res?userId=".concat(data.userId)
                     );
                 });
-            } else {
+            }
+            else if (res.status === 404) {
                 console.log(res);
                 toggleModal();
+                loadingState = false;
+                modalState.title = "Error";
+                modalState.message = "เบอร์โทรศัพท์นี้ยังไม่ได้ลงทะเบียน";
+            } 
+            else {
+                console.log(res);
+                toggleModal();
+                loadingState = false;
                 modalState.title = "Error";
                 modalState.message = "เกิดข้อผิดพลาดบางอย่าง ลองอีกครั้ง";
             }
