@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkForRegistrationEligibility = exports.getParcelDataFromAllParcel = exports.getUserActiveParcels = exports.findUserWithPhoneNumber = exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbRemoveParcelFromUserData = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
+exports.getAllParcel = exports.checkForRegistrationEligibility = exports.getParcelDataFromAllParcel = exports.getUserActiveParcels = exports.findUserWithPhoneNumber = exports.checkIfDocumentExist = exports.dbSetOnUserRegister = exports.dbRemoveParcelFromUserData = exports.dbSetOnParcelRegister = exports.dbRemoveOnUnfollow = exports.dbRemoveDoc = exports.dbSetOnFollow = void 0;
 const dbSetOnFollow = (ref, data) => __awaiter(void 0, void 0, void 0, function* () {
     yield ref.set(data);
 });
@@ -126,4 +126,15 @@ const checkForRegistrationEligibility = (ref) => __awaiter(void 0, void 0, void 
     return (doc.exists && ((_c = doc.data()) === null || _c === void 0 ? void 0 : _c.isRegistered) == false);
 });
 exports.checkForRegistrationEligibility = checkForRegistrationEligibility;
-exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveOnUnfollow, dbRemoveDoc: exports.dbRemoveDoc, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister, getParcelDataFromAllParcel: exports.getParcelDataFromAllParcel, getUserActiveParcels: exports.getUserActiveParcels, checkIfDocumentExist: exports.checkIfDocumentExist, findUserWithPhoneNumber: exports.findUserWithPhoneNumber };
+const getAllParcel = (allRef) => __awaiter(void 0, void 0, void 0, function* () {
+    const snap = yield allRef.get();
+    let ansArr = [];
+    if (!snap.empty) {
+        snap.forEach((doc) => {
+            ansArr.push(doc.data());
+        });
+    }
+    return ansArr;
+});
+exports.getAllParcel = getAllParcel;
+exports.default = { dbSetOnFollow: exports.dbSetOnFollow, dbRemoveOnUnfollow: exports.dbRemoveOnUnfollow, dbRemoveDoc: exports.dbRemoveDoc, dbSetOnParcelRegister: exports.dbSetOnParcelRegister, dbSetOnUserRegister: exports.dbSetOnUserRegister, getParcelDataFromAllParcel: exports.getParcelDataFromAllParcel, getUserActiveParcels: exports.getUserActiveParcels, checkIfDocumentExist: exports.checkIfDocumentExist, findUserWithPhoneNumber: exports.findUserWithPhoneNumber, getAllParcel: exports.getAllParcel };

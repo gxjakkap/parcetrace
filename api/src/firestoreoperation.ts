@@ -168,5 +168,16 @@ export const checkForRegistrationEligibility = async (ref: FirebaseFirestore.Doc
     return (doc.exists && doc.data()?.isRegistered == false)
 }
 
-export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber }
+export const getAllParcel = async (allRef:FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>) => {
+    const snap = await allRef.get()
+    let ansArr: FirebaseFirestore.DocumentData[]|any[] = []
+    if (!snap.empty){
+        snap.forEach((doc) => {
+            ansArr.push(doc.data())
+        })
+    }
+    return ansArr
+}
+
+export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber, getAllParcel }
 export type { userParcel, allParcel, userData }
