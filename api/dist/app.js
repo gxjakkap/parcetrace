@@ -265,7 +265,7 @@ app.get('/allparcellist', (req, res) => {
         .then((data) => {
         if (data || (data !== undefined || data !== null)) {
             if ((data === null || data === void 0 ? void 0 : data.length) > 0) {
-                res.status(200).json({ status: 200, data: [] });
+                res.status(200).json({ status: 200, data: data });
             }
             else {
                 res.status(404).json({ status: 404, data: [] });
