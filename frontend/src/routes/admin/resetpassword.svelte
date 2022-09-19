@@ -53,16 +53,16 @@
   };
 
   onMount(() => {
-    if (browser) {
-      let ss = localStorage.getItem("ptracecr");
-      const savedSession = JSON.parse(ss as string);
-      const lastLogin = Number(savedSession.user.lastLoginAt);
-      const now = Date.now();
-      const diff = now - lastLogin;
-      if (ss && diff < 60 * 60 * 24 * 7) {
-        location.replace("/admin/parcellist");
-      }
+    //if (browser) {
+    let ss = localStorage.getItem("ptracecr");
+    const savedSession = JSON.parse(ss as string);
+    const lastLogin = Number(savedSession.user.lastLoginAt);
+    const now = Date.now();
+    const diff = now - lastLogin;
+    if (ss && diff < 60 * 60 * 24 * 7) {
+      location.replace("/admin/parcellist");
     }
+    //}
   });
 
   async function onSubmit() {

@@ -20,24 +20,24 @@
 
   let permitted = true;
   onMount(() => {
-    if (browser) {
-      let ss = localStorage.getItem("ptracecr");
-      const savedSession = JSON.parse(ss as string);
-      let diff: number = 605000;
-      try {
-        const lastLogin = Number(savedSession.user.lastLoginAt);
-        const now = Date.now();
-        diff = now - lastLogin;
-      } catch {
-        permitted = false;
-        location.replace("/admin");
-      }
-      if (!ss || diff > 60 * 60 * 24 * 7) {
-        permitted = false;
-        console.log("hi");
-        location.replace("/admin");
-      }
+    //if (browser) {
+    let ss = localStorage.getItem("ptracecr");
+    const savedSession = JSON.parse(ss as string);
+    let diff: number = 605000;
+    try {
+      const lastLogin = Number(savedSession.user.lastLoginAt);
+      const now = Date.now();
+      diff = now - lastLogin;
+    } catch {
+      permitted = false;
+      location.replace("/admin");
     }
+    if (!ss || diff > 60 * 60 * 24 * 7) {
+      permitted = false;
+      console.log("hi");
+      location.replace("/admin");
+    }
+    //}
   });
 
   async function getData() {
