@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/env";
+  
   import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
   import { initializeApp } from "firebase/app";
   import { FIREBASE_CONFIG } from "$lib/env";
@@ -60,6 +60,7 @@
   };
 
   onMount(() => {
+    import { browser } from "$app/env";
     if (browser) {
       let ss = localStorage.getItem("ptracecr");
       const savedSession = JSON.parse(ss as string);
