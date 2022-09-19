@@ -60,7 +60,6 @@
   };
 
   onMount(() => {
-    import { browser } from "$app/env";
     if (browser) {
       let ss = localStorage.getItem("ptracecr");
       const savedSession = JSON.parse(ss as string);
