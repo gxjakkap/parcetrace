@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/env";
+  
   import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
   import { initializeApp } from "firebase/app";
   import { FIREBASE_CONFIG } from "$lib/env";
