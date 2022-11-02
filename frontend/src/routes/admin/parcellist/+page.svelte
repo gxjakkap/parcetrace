@@ -52,15 +52,6 @@
 
   function waitforData(): Promise<any> {
     return new Promise((resolve, reject) => {
-      /* getData().then((res) => {
-        if (res.status === 200) {
-          res.json().then((data) => {
-            resolve(data);
-          });
-        } else {
-          reject(res.status);
-        }
-      }); */
       getData()
         .then((res) => {
           if (res.status === 200) {
