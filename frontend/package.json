@@ -3,11 +3,10 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "vite dev",
-    "dev-exp": "svelte-kit dev --host",
-    "build": "svelte-kit build",
+    "dev-exp": "vite dev --host",
+    "build": "vite build",
     "package": "svelte-kit package",
     "preview": "svelte-kit preview",
-    "prepare": "svelte-kit sync",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch"
   },
