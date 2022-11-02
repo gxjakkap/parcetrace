@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/env";
+  import { browser } from "$app/environment";
   import { API_KEY, API_URL } from "$lib/env";
   import { onMount } from "svelte";
   import Modal from "$lib/modal.svelte";

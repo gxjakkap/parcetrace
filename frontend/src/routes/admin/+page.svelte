@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { browser } from "$app/env";
+  import { browser } from "$app/environment";
   import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
   import { initializeApp } from "firebase/app";
   import { FIREBASE_CONFIG } from "$lib/env";
@@ -137,6 +137,11 @@
         type="password"
         class="font-Prompt block border border-gray-400 dark:border-gray-700 text-black dark:text-white w-full p-3 rounded mb-4 bg-white dark:bg-slate-500"
         placeholder="Password"
+        on:keypress={(e) => {
+          if (e.key === "Enter") {
+              onSubmit();
+          }
+      }}
         bind:value={credentials.password}
       />
 
