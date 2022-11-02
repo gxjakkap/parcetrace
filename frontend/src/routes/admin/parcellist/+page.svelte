@@ -60,6 +60,7 @@
               ansArr.sort((a, b) => {
                 return b.date - a.date;
               });
+              console.log(ansArr);
               resolve(ansArr);
             });
           } else {
@@ -107,6 +108,10 @@
   };
 </script>
 
+<svelte:head>
+  <title>Parcel List - Parcetrace</title>
+</svelte:head>
+
 <main>
   {#if permitted}
     {#await waitforData()}
@@ -128,7 +133,9 @@
         >
           <a href={""} on:click={logOut}>Log Out</a>
         </h3>
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3">
+        <div
+          class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3 lg:ml-10 lg:mr-10"
+        >
           <table
             class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
           >
