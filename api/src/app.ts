@@ -395,7 +395,7 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
         if (hash==docdata?.hash){
             const newuuid = uuidv4()
             const uuidsalt = crypto.randomBytes(7).toString('base64url')
-            const sessionhash = (newuuid + uuidsalt)
+            const sessionhash = (crypto.createHash('sha256').update(newuuid + uuidsalt).digest('hex'))
             const ssref = db.collection('activeMobileSession')
             const newsession = {
                 hash: sessionhash,
