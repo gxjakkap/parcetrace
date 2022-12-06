@@ -107,7 +107,9 @@
       >
         {`${data.userData.name} ${data.userData.surname} (${data.lineData.displayName})`}
       </h3>
-      <div class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3">
+      <div
+        class="relative overflow-x-auto shadow-md sm:rounded-lg ml-3 mr-3 lg:ml-10 lg:mr-10"
+      >
         <table
           class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
         >
@@ -149,7 +151,7 @@
                 >
                   <a
                     href={`https://parcetrace.vercel.app/confirmation?pid=${d.parcelId}`}
-                    rel="noreferer"
+                    rel="noreferrer"
                     target="_blank">ยืนยันการรับ</a
                   >
                 </td>
