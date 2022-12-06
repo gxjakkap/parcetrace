@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
+const uuid_1 = require("uuid");
 const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
@@ -367,6 +368,55 @@ app.post('/parcelrem', (req, res) => {
             console.log(err);
             res.status(500).json({ status: 500, message: "Internal Server Error" });
         });
+    });
+});
+/**  registering mobile device for the first time, the flow is
+ *      - recieve master password provided by client
+ *      - retrieve the salt from the database
+ *      - hash client provided password and compare it to the hash stored in the database
+ *      - if it matches, then the server will generate a new session id and store it on the database
+ *      - it will then response with sessionid generated *
+ */
+app.post('/adminapp/authen', (req, res) => {
+    let data;
+    try {
+        data = req.body;
+        if (!data.password) {
+            throw new Error('Invalid data');
+        }
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" });
+        console.log('Bad request recieved');
+        console.log(err);
+        return;
+    }
+    const docRef = db.collection('credentials').doc('mobilemasterkey');
+    docRef.get().then(doc => {
+        const docdata = doc.data();
+        const hash = crypto_1.default.createHash('sha256').update(data.password + (docdata === null || docdata === void 0 ? void 0 : docdata.salt)).digest('hex');
+        if (hash == (docdata === null || docdata === void 0 ? void 0 : docdata.hash)) {
+            const newuuid = (0, uuid_1.v4)();
+            const uuidsalt = crypto_1.default.randomBytes(7).toString('base64url');
+            const sessionhash = (newuuid + uuidsalt);
+            const ssref = db.collection('activeMobileSession');
+            const newsession = {
+                hash: sessionhash,
+                salt: uuidsalt,
+                dateAdded: Date.now()
+            };
+            ssref.add(newsession).then(nref => {
+                if (nref) {
+                    res.status(200).json({ status: 200, sessionid: newuuid });
+                }
+                else {
+                    res.status(500).json({ status: 500, message: "Internal Server Error" });
+                }
+            });
+        }
+        else {
+            res.status(401).json({ status: 401, message: "Wrong Password!" });
+        }
     });
 });
 https_1.default.createServer(sslCredentials, app)

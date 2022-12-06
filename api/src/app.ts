@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
@@ -361,6 +362,59 @@ app.post('/parcelrem', (req: Request, res: Response) => {
                     res.status(500).json({ status: 500, message: "Internal Server Error" })
                 })
         })
+})
+
+/**  registering mobile device for the first time, the flow is
+ *      - recieve master password provided by client
+ *      - retrieve the salt from the database
+ *      - hash client provided password and compare it to the hash stored in the database
+ *      - if it matches, then the server will generate a new session id and store it on the database
+ *      - it will then response with sessionid generated * 
+ */
+app.post('/adminapp/authen', (req: Request, res: Response) => {
+    let data: any
+    try {
+        data = req.body
+        if (!data.password) {
+            throw new Error('Invalid data')
+        }
+
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        console.log(err)
+        return
+    }
+
+
+    const docRef = db.collection('credentials').doc('mobilemasterkey')
+    docRef.get().then(doc => {
+        const docdata = doc.data()
+        const hash = crypto.createHash('sha256').update(data.password+docdata?.salt).digest('hex')
+        if (hash==docdata?.hash){
+            const newuuid = uuidv4()
+            const uuidsalt = crypto.randomBytes(7).toString('base64url')
+            const sessionhash = (newuuid + uuidsalt)
+            const ssref = db.collection('activeMobileSession')
+            const newsession = {
+                hash: sessionhash,
+                salt: uuidsalt,
+                dateAdded: Date.now()
+            }
+            ssref.add(newsession).then(nref => {
+                if (nref){
+                    res.status(200).json({status: 200, sessionid: newuuid})
+                }
+                else {
+                    res.status(500).json({status: 500, message: "Internal Server Error"})
+                }
+            })
+        }
+        else {
+            res.status(401).json({status: 401, message: "Wrong Password!"})
+        }
+    })
 })
 
 
