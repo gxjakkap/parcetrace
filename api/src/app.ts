@@ -394,12 +394,9 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
         const hash = crypto.createHash('sha256').update(data.password+docdata?.salt).digest('hex')
         if (hash==docdata?.hash){
             const newuuid = uuidv4()
-            const uuidsalt = crypto.randomBytes(7).toString('base64url')
-            const sessionhash = (crypto.createHash('sha256').update(newuuid + uuidsalt).digest('hex'))
             const ssref = db.collection('activeMobileSession')
             const newsession = {
-                hash: sessionhash,
-                salt: uuidsalt,
+                id: newuuid,
                 dateAdded: Date.now()
             }
             ssref.add(newsession).then(nref => {
@@ -415,6 +412,53 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
             res.status(401).json({status: 401, message: "Wrong Password!"})
         }
     })
+})
+
+/**
+ * Remove session aka. logout.
+ * remove that session from the database. 
+ */
+ app.post('/adminapp/logout', (req: Request, res: Response) => {
+    let data: any
+    try {
+        data = req.body
+        if (!data.sessionid) {
+            throw new Error('Invalid data')
+        }
+
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        console.log(err)
+        return
+    }
+
+
+    const docRef = db.collection('activeMobileSession')
+
+    docRef.where('id', '==', data.sessionid).get()
+        .then(snapshot => {
+            if (snapshot.empty){
+                res.status(404).json({message: "Session doesn't exist"})
+                return
+            }
+
+            if (snapshot.size > 1){
+                res.status(500).json({ message: "Internal Server Error"})
+                return
+            }
+
+            db.collection('activeMobileSession').doc(snapshot.docs[0].id).delete()
+                .then(x => {
+                    res.status(200).json({message: "Success"})
+                })
+                .catch(err => {
+                    res.status(500).json({ message: "Internal Server Error"})
+                })
+
+        })
+   
 })
 
 
