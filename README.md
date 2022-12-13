@@ -22,6 +22,8 @@ A solution for Condominium juristic person for notifying tenants about their pac
 
 * [/frontend](https://github.com/gxjakkap/parcetrace/tree/main/frontend): SvelteKit Frontend. Intended to be deployed on Vercel.
 
+* [/native](https://github.com/gxjakkap/parcetrace/tree/main/native): Mobile admin application for registering parcel with OCR technology.
+
 ## License
 
 [gxjakkap/parcetrace](https://github.com/gxjakkap/parcetrace) is licensed under [GNU General Public License V3](https://github.com/gxjakkap/parcetrace/blob/main/COPYING)
