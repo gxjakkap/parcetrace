@@ -400,6 +400,7 @@ app.post('/adminapp/authen', (req, res) => {
             const ssref = db.collection('activeMobileSession');
             const newsession = {
                 id: newuuid,
+                userAgent: data.userAgent,
                 dateAdded: Date.now()
             };
             ssref.add(newsession).then(nref => {
