@@ -4,10 +4,13 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@nativescript/camera": "^5.0.15",
     "@nativescript/core": "~8.3.0",
+    "@nativescript/firebase": "^11.1.3",
     "@nativescript/tailwind": "^2.0.1",
     "@nativescript/theme": "~3.0.2",
     "@nstudio/nativescript-loading-indicator": "^4.1.2",
+    "nativescript-dna-deviceinfo": "^3.7.3",
     "nativescript-feedback": "^2.0.0",
     "svelte-native": "~1.0.0",
     "tailwindcss": "^3.2.4"
