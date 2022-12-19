@@ -8,6 +8,7 @@
         process.env.NODE_ENV === "production" ? process.env.API_KEY : API_KEY;
     const apiUrl =
         process.env.NODE_ENV === "production" ? process.env.API_URL : API_URL;
+    const baseUrl = process.env.VERCEL_URL ? process.env.VERCEL_URL : '127.0.0.1:5173'
 
     let phoneNumber: string = "";
 
@@ -33,13 +34,9 @@
             return;
         }
         loadingState = true;
-        fetch(`https://${apiUrl}/getUserId?phoneNo=${phoneNumber}`, {
+        fetch(`https://${baseUrl}/api/getUserId?phoneNo=${phoneNumber}`, {
             method: "GET",
             cache: "no-cache",
-            headers: {
-                "Content-Type": "application/json",
-                authorization: apikey as string,
-            },
         }).then((res) => {
             if (res.status === 200) {
                 res.json().then((data) => {
