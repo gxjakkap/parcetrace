@@ -51,12 +51,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 
-	req.Header.Set("authorization", apiKey)
-
 	if err != nil {
 		handleError(err, w, "Internal Server Error")
 		return
 	}
+
+	req.Header.Set("authorization", apiKey)
 
 	res, err := client.Do(req)
 
