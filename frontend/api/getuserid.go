@@ -97,5 +97,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		userId: SuccesServerResponse.UserId,
 	}
 	fRes, err := json.Marshal(fResVal)
+
+	if err != nil {
+		handleError(err, w, "Internal Server Error (JSON fRes Marshal)")
+		return
+	}
+	fmt.Printf("%+v\n", fResVal)
+	fmt.Printf(string(fRes))
 	fmt.Fprint(w, string(fRes))
 }
