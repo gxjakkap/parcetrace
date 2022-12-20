@@ -34,7 +34,7 @@
             return;
         }
         loadingState = true;
-        fetch(`https://${baseUrl}/api/getUserId?phoneNo=${phoneNumber}`, {
+        fetch(`https://${baseUrl}/api/getuserid?phoneNo=${phoneNumber}`, {
             method: "GET",
             cache: "no-cache",
         }).then((res) => {
