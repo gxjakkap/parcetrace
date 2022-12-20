@@ -32,7 +32,7 @@ func handleError(err error, w http.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusInternalServerError)
 	resVal := &ErrorResponse{
 		status:  http.StatusInternalServerError,
-		message: "Internal Server Error",
+		message: message,
 	}
 	resStr, _ := json.Marshal(resVal)
 	fmt.Printf(err.Error())
@@ -97,5 +97,5 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		userId: SuccesServerResponse.UserId,
 	}
 	fRes, err := json.Marshal(fResVal)
-	fmt.Fprint(w, fRes)
+	fmt.Fprint(w, string(fRes))
 }
