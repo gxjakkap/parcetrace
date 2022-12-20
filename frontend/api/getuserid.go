@@ -102,7 +102,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		handleError(err, w, "Internal Server Error (JSON fRes Marshal)")
 		return
 	}
-	fmt.Printf("%+v\n", fResVal)
+	//fmt.Printf("%+v\n", fResVal)
 	fmt.Printf(string(fRes))
 
 	if _, err := fmt.Fprintf(w, string(fRes)); err != nil {
