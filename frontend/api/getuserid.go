@@ -104,5 +104,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Printf("%+v\n", fResVal)
 	fmt.Printf(string(fRes))
-	fmt.Fprint(w, string(fRes))
+
+	if _, err := fmt.Fprintf(w, string(fRes)); err != nil {
+		handleError(err, w, "Internal Server Error (Fprintf)")
+		return
+	}
 }
