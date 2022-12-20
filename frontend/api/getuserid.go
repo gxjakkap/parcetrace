@@ -9,13 +9,13 @@ import (
 )
 
 type SuccesResponse struct {
-	Status int
-	UserId string
+	Status int    `json:"status"`
+	UserId string `json:"userId"`
 }
 
 type ErrorResponse struct {
-	Status  int
-	Message string
+	Status  int    `json:"status"`
+	Message string `json:"message"`
 }
 
 type SuccesServerResponse struct {
