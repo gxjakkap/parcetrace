@@ -67,7 +67,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 	defer res.Body.Close()
 
-	resData, err := ioutil.ReadAll(req.Body)
+	resData, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
 		handleError(err, w, "Internal Server Error (ReadAll)")
