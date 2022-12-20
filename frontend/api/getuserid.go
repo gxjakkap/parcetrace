@@ -31,8 +31,8 @@ type ErrorServerResponse struct {
 func handleError(err error, w http.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusInternalServerError)
 	resVal := &ErrorResponse{
-		status:  http.StatusInternalServerError,
-		message: message,
+		Status:  http.StatusInternalServerError,
+		Message: message,
 	}
 	resStr, _ := json.Marshal(resVal)
 	fmt.Printf(err.Error())
@@ -75,17 +75,17 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var SuccesServerResponse SuccesServerResponse
-	var ErrorServerResponse ErrorResponse
+	var ErrorServerResponse ErrorServerResponse
 
 	if err := json.Unmarshal(resData, &SuccesServerResponse); err != nil {
 		if err := json.Unmarshal(resData, &ErrorServerResponse); err != nil {
 			handleError(err, w, "Internal Server Error (JSON Parsing)")
 			return
 		}
-		if ErrorServerResponse.status == http.StatusNotFound {
+		if ErrorServerResponse.Status == http.StatusNotFound {
 			nfResVal := &ErrorResponse{
-				status:  http.StatusNotFound,
-				message: "User Not Found.",
+				Status:  http.StatusNotFound,
+				Message: "User Not Found.",
 			}
 			nfRes, _ := json.Marshal(nfResVal)
 			fmt.Fprintf(w, string(nfRes))
@@ -93,8 +93,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fResVal := &SuccesResponse{
-		status: http.StatusOK,
-		userId: SuccesServerResponse.UserId,
+		Status: http.StatusOK,
+		UserId: SuccesServerResponse.UserId,
 	}
 	fRes, err := json.Marshal(fResVal)
 
