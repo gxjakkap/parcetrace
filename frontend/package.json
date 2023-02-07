@@ -1,6 +1,7 @@
 {
-  "name": "frontend",
+  "name": "@gxjakkap/parcetrace-fe",
   "version": "0.0.1",
+  "license": "LGPL-3.0",
   "scripts": {
     "dev": "vite dev",
     "dev-exp": "vite dev --host",

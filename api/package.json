@@ -1,5 +1,5 @@
 {
-  "name": "parcetrace-api",
+  "name": "@gxjakkap/parcetrace-api",
   "version": "0.1.0",
   "description": "Parcetrace's api",
   "main": "dist/app.js",
@@ -9,7 +9,7 @@
     "build": "tsc"
   },
   "author": "",
-  "license": "ISC",
+  "license": "LGPL-3.0",
   "dependencies": {
     "@line/bot-sdk": "^7.5.0",
     "@types/axios": "^0.14.0",
