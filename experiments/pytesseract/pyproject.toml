@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "parcetraceexp-pytesseract"
+version = "0.1.0"
+description = ""
+authors = ["Jakkaphat Chalermphanaphan <gunt@guntxjakka.me>"]
+license = "LGPL-3.0"
+readme = "README.md"
+packages = [{include = "parcetraceexp_pytesseract"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytesseract = "^0.3.10"
+pillow = "^9.4.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
