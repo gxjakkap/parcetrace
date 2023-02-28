@@ -109,6 +109,7 @@ export default function WelcomePage ({navigation}: Props){
                 onChangeText={setPasswordValue}
                 placeholder="Enter master password here"
                 textContentType="password"
+                secureTextEntry={true}
                 onSubmitEditing={() => onFormSubmit()}
             />
             <Button 

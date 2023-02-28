@@ -149,10 +149,13 @@ const MediaPage = ({ navigation, route }: Props) => {
             <PressableOpacity className={`absolute top-[${SAFE_AREA_PADDING.paddingTop}] left-[${SAFE_AREA_PADDING.paddingLeft}] w-[40] h-[40]`} onPress={navigation.goBack}>
                 <IonIcon name="close" size={35} color="white"  />
             </PressableOpacity>
-            <PressableOpacity className={`absolute bottom-[${SAFE_AREA_PADDING.paddingBottom}] left-[${SAFE_AREA_PADDING.paddingLeft}] w-[40] h-[40]`} onPress={onSavePressed} disabled={savingState !== 'none'}>
+            <PressableOpacity className={`absolute bottom-[50] left-[${SAFE_AREA_PADDING.paddingLeft}] w-[40] h-[40]`} onPress={onSavePressed} disabled={savingState !== 'none'}>
                 {savingState === 'none' && <IonIcon name="download" size={35} color="white" style={styles.icon} />}
                 {savingState === 'saved' && <IonIcon name="checkmark" size={35} color="white" style={styles.icon} />}
                 {savingState === 'saving' && <ActivityIndicator color="white" />}
+            </PressableOpacity>
+            <PressableOpacity className={`absolute bottom-[300] left-[${SAFE_AREA_PADDING.paddingLeft}] w-[40] h-[40]`} onPress={() => {navigation.navigate("OCRTestPage", {path: path})}}>
+                <IonIcon name="document-text-outline" color="white" size={35}/>
             </PressableOpacity>
 
             <StatusBarBlurBackground />

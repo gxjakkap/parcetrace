@@ -76,9 +76,16 @@ export default function Home ({ navigation }: Props){
         <View className="flex-1 bg-white justify-center px-10">
             <Text className="text-xl text-center">Home Page</Text>
             <Button 
-                title="Go To Test"
+                title="Add Parcel"
                 onPress={() => {
                    navigation.navigate("CameraPage")
+                }}
+            
+            />
+            <Button 
+                title="Debug Page"
+                onPress={() => {
+                   navigation.navigate("DebugPage")
                 }}
             
             />

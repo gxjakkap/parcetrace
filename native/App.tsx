@@ -14,6 +14,9 @@ import WelcomePage from './page/Welcome';
 import CameraPage from './page/Camera';
 import MediaPage from './page/Media';
 import PermissionsPage from './page/Permission';
+import DebugPage from './page/Debug';
+
+import OCRTestPage from './page/OCRTest';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,7 +68,9 @@ export default function App(): React.ReactElement | null {
                       <>
                         <Stack.Screen name="Home" component={Home} />
                         <Stack.Screen name='CameraPage' component={CameraPage}/>
+                        <Stack.Screen name='DebugPage' component={DebugPage}/>
                         <Stack.Screen name='MediaPage' component={MediaPage as any} options={{ animation: 'none', presentation: 'transparentModal',}}/>
+                        <Stack.Screen name='OCRTestPage' component={OCRTestPage as any} options={{ animation: 'none', presentation: 'transparentModal',}}/>
                       </>
                     ) :
                     (
