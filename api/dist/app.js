@@ -22,6 +22,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -29,12 +38,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const app_1 = require("firebase-admin/app");
 const firestore_1 = require("firebase-admin/firestore");
+const storage_1 = require("firebase-admin/storage");
 const uuid_1 = require("uuid");
+const node_querystring_1 = require("node:querystring");
 const fs_1 = __importDefault(require("fs"));
 const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
 const cors_1 = __importDefault(require("cors"));
 const crypto_1 = __importDefault(require("crypto"));
+const dateFns = __importStar(require("date-fns"));
 const fst = __importStar(require("./firestoreoperation"));
 const msg = __importStar(require("./message"));
 //set port
@@ -44,9 +56,11 @@ const firebaseCredPath = process.env.cred;
 //init firestore
 const serviceAccount = require(firebaseCredPath);
 (0, app_1.initializeApp)({
-    credential: (0, app_1.cert)(serviceAccount)
+    credential: (0, app_1.cert)(serviceAccount),
+    storageBucket: 'parcetrace.appspot.com'
 });
 const db = (0, firestore_1.getFirestore)();
+const bucket = (0, storage_1.getStorage)().bucket();
 //https
 const sslPrivkey = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem");
 const sslCertificate = fs_1.default.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem");
@@ -106,7 +120,6 @@ app.post('/webhook', (req, res) => {
     console.log('webhook recieved');
     res.status(200).json({});
 });
-//unfinished
 //parcel register path
 app.post('/parcelreg', (req, res) => {
     //check for api key
@@ -117,7 +130,7 @@ app.post('/parcelreg', (req, res) => {
     let body;
     try {
         body = req.body;
-        if (!body.sender || !body.location || !body.userId)
+        if (!body.sender || !body.location || !body.userId || !body.parcelId)
             throw Error('value missing');
     }
     catch (err) {
@@ -125,12 +138,11 @@ app.post('/parcelreg', (req, res) => {
         res.status(400).json({ status: 400, message: 'bad request' });
     }
     console.log(body);
-    let randomUUID = crypto_1.default.randomUUID();
     const date = new Date;
-    const dataForUser = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: randomUUID, location: body.location };
-    const dataForAllActive = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: randomUUID, userId: body.userId, location: body.location };
+    const dataForUser = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: body.userId, location: body.location };
+    const dataForAllActive = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: body.userId, userId: body.userId, location: body.location };
     const userRef = db.collection('users').doc(body.userId);
-    const allActiveRef = db.collection('allActiveParcel').doc(randomUUID);
+    const allActiveRef = db.collection('allActiveParcel').doc(body.userId);
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
         .then(() => {
         msg.sendParcelNotificationMessageNew(body.userId, channelAccessToken, dataForUser);
@@ -150,7 +162,7 @@ app.post('/userreg', (req, res) => {
     try {
         data = req.body;
         if (!data.userId || !data.name || !data.surname || !data.phoneNumber || !data.room) {
-            throw new Error('Invalid data');
+            throw new Error('Invalid data (trace: userreg)');
         }
     }
     catch (err) {
@@ -232,14 +244,6 @@ app.get('/parcelcheck', (req, res) => {
     const docRef = db.collection('users').doc(userId);
     fst.getUserActiveParcels(docRef)
         .then(data => {
-        /* if (activeParcels.length > 0) {
-            console.log('active parcels found')
-            res.status(200).json({ status: 200, parcels: activeParcels })
-        }
-        else {
-            console.log('no active parcels found')
-            res.status(200).json({ status: 200, parcels: [] })
-        } */
         if (data || (data !== undefined || data !== null)) {
             if ((data === null || data === void 0 ? void 0 : data.activeParcel.length) > 0) {
                 res.status(200).json({ status: 200, parcels: data === null || data === void 0 ? void 0 : data.activeParcel, userData: data === null || data === void 0 ? void 0 : data.userData, lineData: data === null || data === void 0 ? void 0 : data.lineData });
@@ -277,21 +281,6 @@ app.get('/allparcellist', (req, res) => {
         console.log(err);
         res.status(500).json({ status: 500, message: "Internal Server Error" });
     });
-    /* fst.getUserActiveParcels(docRef)
-        .then(data => {
-            if (data || (data !== undefined || data !== null)){
-                if (data?.activeParcel.length > 0){
-                    res.status(200).json({ status: 200, parcels: data?.activeParcel, userData: data?.userData, lineData: data?.lineData })
-                }
-                else {
-                    res.status(200).json({ status: 200, parcels: [], userData: data?.userData, lineData: data?.lineData })
-                }
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ status: 500, message: "Internal Server Error" })
-        }) */
 });
 app.get('/getparceldata', (req, res) => {
     //check for api key
@@ -333,7 +322,7 @@ app.post('/parcelrem', (req, res) => {
     try {
         data = req.body;
         if (!data.parcelId) {
-            throw new Error('Invalid data');
+            throw new Error('Invalid data (trace: parcelrem)');
         }
     }
     catch (err) {
@@ -382,7 +371,7 @@ app.post('/adminapp/authen', (req, res) => {
     try {
         data = req.body;
         if (!data.password) {
-            throw new Error('Invalid data');
+            throw new Error('Invalid data (trace: adminapp/authen)');
         }
     }
     catch (err) {
@@ -426,7 +415,7 @@ app.post('/adminapp/logout', (req, res) => {
     try {
         data = req.body;
         if (!data.sessionid) {
-            throw new Error('Invalid data');
+            throw new Error('Invalid data (trace: adminapp/logout)');
         }
     }
     catch (err) {
@@ -455,7 +444,42 @@ app.post('/adminapp/logout', (req, res) => {
         });
     });
 });
+app.post('/adminapp/ocr', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let data;
+    try {
+        data = req.body;
+        if (!data.sessionid || !data.imageString) {
+            throw new Error('Invalid data (trace: adminapp/ocr)');
+        }
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" });
+        console.log('Bad request recieved');
+        console.log(err);
+        return;
+    }
+    const { sessionid, imageString } = data;
+    const docRef = db.collection('activeMobileSession');
+    const snapshot = yield docRef.where('id', '==', sessionid).get();
+    if (snapshot.empty) {
+        res.status(401).json({ message: "Session doesn't exist" });
+        return;
+    }
+    if (snapshot.size > 1) {
+        res.status(500).json({ message: "Internal Server Error (trace: adminadd/ocr dupesession)" });
+        return;
+    }
+    const parcelId = (0, uuid_1.v4)();
+    yield bucket.file(`${parcelId}.jpg`).save(Buffer.from(imageString, 'base64'));
+    const imageUrl = yield bucket.file(`${parcelId}.jpg`).getSignedUrl({ action: 'read', expires: dateFns.add(new Date(), { days: 1 }) });
+    const ocrRes = yield fetch(`${process.env.OCR_GS}?${(0, node_querystring_1.stringify)({ imageurl: imageUrl })}`);
+    if (ocrRes.status !== 200) {
+        res.status(500).json({ status: 500, message: "Internal Server Error (trace: ocr req)" });
+        return;
+    }
+    let ocrText = yield ocrRes.text();
+    ocrText = ocrText.substring(2);
+    res.status(200).json({ status: 200, text: ocrText, id: parcelId });
+}));
 https_1.default.createServer(sslCredentials, app)
-    .listen(port, () => {
-    console.log(`App listening on port ${port}`);
-});
+    .listen(port, () => { console.log(`App listening on port ${port}`); });

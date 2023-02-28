@@ -1,12 +1,15 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import { getStorage } from 'firebase-admin/storage'
 import { v4 as uuidv4 } from 'uuid';
+import { stringify as queryStringify } from 'node:querystring';
 import fs from 'fs'
 import https from 'https'
 import axios from 'axios'
 import cors from 'cors'
 import crypto from 'crypto'
+import * as dateFns from 'date-fns'
 import * as fst from './firestoreoperation'
 import * as msg from './message'
 
@@ -19,9 +22,12 @@ const firebaseCredPath = process.env.cred as string
 //init firestore
 const serviceAccount = require(firebaseCredPath)
 initializeApp({
-    credential: cert(serviceAccount)
+    credential: cert(serviceAccount),
+    storageBucket: 'parcetrace.appspot.com'
 })
+
 const db = getFirestore()
+const bucket = getStorage().bucket()
 
 //https
 const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
@@ -90,7 +96,7 @@ app.post('/webhook', (req: Request, res: Response) => {
     console.log('webhook recieved')
     res.status(200).json({})
 })
-//unfinished
+
 //parcel register path
 app.post('/parcelreg', (req: Request, res: Response) => {
     //check for api key
@@ -101,19 +107,18 @@ app.post('/parcelreg', (req: Request, res: Response) => {
     let body: any
     try {
         body = req.body
-        if (!body.sender || !body.location || !body.userId) throw Error('value missing')
+        if (!body.sender || !body.location || !body.userId || !body.parcelId) throw Error('value missing')
     }
     catch (err) {
         console.log(err)
         res.status(400).json({ status: 400, message: 'bad request' })
     }
     console.log(body)
-    let randomUUID = crypto.randomUUID();
     const date = new Date
-    const dataForUser: fst.userParcel = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: randomUUID, location: body.location }
-    const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: randomUUID, userId: body.userId, location: body.location }
+    const dataForUser: fst.userParcel = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: body.userId, location: body.location }
+    const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: body.sender, parcelId: body.userId, userId: body.userId, location: body.location }
     const userRef = db.collection('users').doc(body.userId as string)
-    const allActiveRef = db.collection('allActiveParcel').doc(randomUUID as string)
+    const allActiveRef = db.collection('allActiveParcel').doc(body.userId as string)
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
         .then(() => {
             msg.sendParcelNotificationMessageNew(body.userId, channelAccessToken as string, dataForUser)
@@ -135,7 +140,7 @@ app.post('/userreg', (req: Request, res: Response) => {
     try {
         data = req.body
         if (!data.userId || !data.name || !data.surname || !data.phoneNumber || !data.room) {
-            throw new Error('Invalid data')
+            throw new Error('Invalid data (trace: userreg)')
         }
     }
     catch (err) {
@@ -219,14 +224,6 @@ app.get('/parcelcheck', (req: Request, res: Response) => {
     const docRef = db.collection('users').doc(userId)
     fst.getUserActiveParcels(docRef)
         .then(data => {
-            /* if (activeParcels.length > 0) {
-                console.log('active parcels found')
-                res.status(200).json({ status: 200, parcels: activeParcels })
-            }
-            else {
-                console.log('no active parcels found')
-                res.status(200).json({ status: 200, parcels: [] })
-            } */
             if (data || (data !== undefined || data !== null)){
                 if (data?.activeParcel.length > 0){
                     res.status(200).json({ status: 200, parcels: data?.activeParcel, userData: data?.userData, lineData: data?.lineData })
@@ -264,23 +261,7 @@ app.get('/allparcellist', (req: Request, res: Response) => {
         .catch(err => {
             console.log(err)
             res.status(500).json({ status: 500, message: "Internal Server Error" })
-        })
-    /* fst.getUserActiveParcels(docRef)
-        .then(data => {
-            if (data || (data !== undefined || data !== null)){
-                if (data?.activeParcel.length > 0){
-                    res.status(200).json({ status: 200, parcels: data?.activeParcel, userData: data?.userData, lineData: data?.lineData })
-                }
-                else {
-                    res.status(200).json({ status: 200, parcels: [], userData: data?.userData, lineData: data?.lineData })
-                }
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ status: 500, message: "Internal Server Error" })
-        }) */
-    
+        })    
 })
 
 app.get('/getparceldata', (req: Request, res: Response) => {
@@ -325,7 +306,7 @@ app.post('/parcelrem', (req: Request, res: Response) => {
     try {
         data = req.body
         if (!data.parcelId) {
-            throw new Error('Invalid data')
+            throw new Error('Invalid data (trace: parcelrem)')
         }
     }
     catch (err) {
@@ -376,7 +357,7 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
     try {
         data = req.body
         if (!data.password) {
-            throw new Error('Invalid data')
+            throw new Error('Invalid data (trace: adminapp/authen)')
         }
 
     }
@@ -424,7 +405,7 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
     try {
         data = req.body
         if (!data.sessionid) {
-            throw new Error('Invalid data')
+            throw new Error('Invalid data (trace: adminapp/logout)')
         }
 
     }
@@ -462,8 +443,57 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
    
 })
 
+app.post('/adminapp/ocr', async (req: Request, res: Response) => {
+    let data: any
+    try {
+        data = req.body
+        if (!data.sessionid || !data.imageString) {
+            throw new Error('Invalid data (trace: adminapp/ocr)')
+        }
+
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        console.log(err)
+        return
+    }
+
+    const { sessionid, imageString } = data
+
+    const docRef = db.collection('activeMobileSession')
+
+    const snapshot = await docRef.where('id', '==', sessionid).get()
+
+    if (snapshot.empty){
+        res.status(401).json({message: "Session doesn't exist"})
+        return
+    }
+
+    if (snapshot.size > 1){
+        res.status(500).json({ message: "Internal Server Error (trace: adminadd/ocr dupesession)"})
+        return
+    }
+
+    const parcelId = uuidv4()
+
+    await bucket.file(`${parcelId}.jpg`).save(Buffer.from(imageString, 'base64'))
+
+    const imageUrl = await bucket.file(`${parcelId}.jpg`).getSignedUrl({action: 'read', expires: dateFns.add(new Date(), {days: 1})})
+
+    const ocrRes = await fetch(`${process.env.OCR_GS}?${queryStringify({imageurl: imageUrl})}`)
+
+    if (ocrRes.status !== 200){
+        res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
+        return
+    }
+
+    let ocrText = await ocrRes.text()
+    ocrText = ocrText.substring(2)
+
+    res.status(200).json({status: 200, text: ocrText, id: parcelId})
+})
+
 
 https.createServer(sslCredentials, app)
-    .listen(port, () => {
-        console.log(`App listening on port ${port}`)
-})
+    .listen(port, () => {console.log(`App listening on port ${port}`)})
