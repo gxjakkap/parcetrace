@@ -31,10 +31,9 @@ import {
 } from 'react-native-vision-camera';
 import Reanimated, { Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedProps, useSharedValue } from 'react-native-reanimated';
 import { PinchGestureHandler, PinchGestureHandlerGestureEvent, TapGestureHandler } from 'react-native-gesture-handler';
-import { PressableOpacity } from 'react-native-pressable-opacity';
-import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { PressableOpacity } from 'react-native-pressable-opacity';import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, Platform } from 'react-native';
 import * as React from 'react';
 
 import { CONTENT_SPACING, MAX_ZOOM_FACTOR, SAFE_AREA_PADDING } from '../etc/constants';
@@ -69,9 +68,7 @@ const CameraPage = ({ navigation }: Props) => {
     const isActive = isFocused && isForeground
 
     const [cameraPosition, setCameraPosition] = React.useState<'front' | 'back'>('back')
-    const [enableHdr, setEnableHdr] = React.useState(false)
     const [flash, setFlash] = React.useState<'off' | 'on'>('off')
-    const [enableNightMode, setEnableNightMode] = React.useState(false)
     
     // camera format settings
     const devices = useCameraDevices();
@@ -83,47 +80,16 @@ const CameraPage = ({ navigation }: Props) => {
 
     //#region Memos
     const [is60Fps, setIs60Fps] = React.useState(true);
-    const fps = React.useMemo(() => {
-        if (!is60Fps) return 30;
-
-        if (enableNightMode && !device?.supportsLowLightBoost) {
-        // User has enabled Night Mode, but Night Mode is not natively supported, so we simulate it by lowering the frame rate.
-        return 30;
-        }
-
-        const supportsHdrAt60Fps = formats.some((f) => f.supportsVideoHDR && f.frameRateRanges.some((r) => frameRateIncluded(r, 60)));
-        if (enableHdr && !supportsHdrAt60Fps) {
-        // User has enabled HDR, but HDR is not supported at 60 FPS.
-        return 30;
-        }
-
-        const supports60Fps = formats.some((f) => f.frameRateRanges.some((r) => frameRateIncluded(r, 60)));
-        if (!supports60Fps) {
-        // 60 FPS is not supported by any format.
-        return 30;
-        }
-        // If nothing blocks us from using it, we default to 60 FPS.
-        return 60;
-    }, [device?.supportsLowLightBoost, enableHdr, enableNightMode, formats, is60Fps]);
+    const fps = 30;
 
     const supportsCameraFlipping = React.useMemo(() => devices.back != null && devices.front != null, [devices.back, devices.front]);
     const supportsFlash = device?.hasFlash ?? false;
-    const supportsHdr = React.useMemo(() => formats.some((f) => f.supportsVideoHDR || f.supportsPhotoHDR), [formats]);
-    const supports60Fps = React.useMemo(() => formats.some((f) => f.frameRateRanges.some((rate) => frameRateIncluded(rate, 60))), [formats])
-    const canToggleNightMode = enableNightMode ? true : (device?.supportsLowLightBoost ?? false) || fps > 30
     //#endregion
 
     const format = React.useMemo(() => {
         let result = formats;
-        if (enableHdr) {
-        // We only filter by HDR capable formats if HDR is set to true.
-        // Otherwise we ignore the `supportsVideoHDR` property and accept formats which support HDR `true` or `false`
-        result = result.filter((f) => f.supportsVideoHDR || f.supportsPhotoHDR);
-        }
-
-        // find the first format that includes the given FPS
         return result.find((f) => f.frameRateRanges.some((r) => frameRateIncluded(r, fps)));
-    }, [formats, fps, enableHdr]);
+    }, [formats, fps]);
 
     //#region Animated Zoom
     // This just maps the zoom factor to a percentage value.
@@ -238,10 +204,9 @@ const CameraPage = ({ navigation }: Props) => {
                         ref={camera}
                         style={StyleSheet.absoluteFill}
                         device={device}
-                        format={format}
+                        format={undefined}
+                        preset={"hd-1920x1080"}
                         /* fps={fps} */
-                        hdr={enableHdr}
-                        lowLightBoost={device.supportsLowLightBoost && enableNightMode}
                         isActive={isActive}
                         onInitialized={onInitialized}
                         onError={onError}
