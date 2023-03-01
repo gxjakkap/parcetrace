@@ -30,6 +30,6 @@ Native mobile app for admins.
 
 1. run `npx expo prebuild`
 
-2. run `eas build -p android -t apk`
+2. run `eas build -p android --profile production`
 
 3. wait for the build to finish.
