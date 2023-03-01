@@ -468,12 +468,19 @@ app.post('/adminapp/ocr', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ message: "Internal Server Error (trace: adminadd/ocr dupesession)" });
         return;
     }
-    const ocrRes = yield fetch(`${process.env.OCR_GS}?${(0, node_querystring_1.stringify)({ imageurl: imageUrl })}`);
-    if (ocrRes.status !== 200) {
-        res.status(500).json({ status: 500, message: "Internal Server Error (trace: ocr req)" });
-        return;
+    let ocrText = "";
+    try {
+        const ocrRes = yield axios_1.default.get(`${process.env.OCR_GS}?${(0, node_querystring_1.stringify)({ imageurl: imageUrl })}`);
+        if (ocrRes.status !== 200) {
+            res.status(500).json({ status: 500, message: "Internal Server Error (trace: ocr req)" });
+            return;
+        }
+        ocrText = ocrRes.toString();
     }
-    let ocrText = yield ocrRes.text();
+    catch (e) {
+        console.log(e);
+        res.status(500).json({ status: 500, message: "Internal Server Error (trace: ocr req)" });
+    }
     ocrText = ocrText.substring(2);
     res.status(200).json({ status: 200, text: ocrText, id: parcelId });
 }));

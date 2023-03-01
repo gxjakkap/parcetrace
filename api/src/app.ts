@@ -475,14 +475,22 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
         return
     }
 
-    const ocrRes = await fetch(`${process.env.OCR_GS}?${queryStringify({imageurl: imageUrl})}`)
+    let ocrText = ""
 
-    if (ocrRes.status !== 200){
+    try {
+        const ocrRes = await axios.get(`${process.env.OCR_GS}?${queryStringify({imageurl: imageUrl})}`)
+        if (ocrRes.status !== 200){
+            res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
+            return
+        }
+        ocrText = ocrRes.toString()
+    }
+    catch(e){
+        console.log(e)
         res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
-        return
     }
 
-    let ocrText = await ocrRes.text()
+    
     ocrText = ocrText.substring(2)
 
     res.status(200).json({status: 200, text: ocrText, id: parcelId})
