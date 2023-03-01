@@ -447,7 +447,7 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
     let data: any
     try {
         data = req.body
-        if (!data.sessionid || !data.imageString) {
+        if (!data.sessionid || !data.imageUrl || !data.parcelId) {
             throw new Error('Invalid data (trace: adminapp/ocr)')
         }
 
@@ -459,7 +459,7 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
         return
     }
 
-    const { sessionid, imageString } = data
+    const { sessionid, imageUrl, parcelId } = data
 
     const docRef = db.collection('activeMobileSession')
 
@@ -474,12 +474,6 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
         res.status(500).json({ message: "Internal Server Error (trace: adminadd/ocr dupesession)"})
         return
     }
-
-    const parcelId = uuidv4()
-
-    await bucket.file(`${parcelId}.jpg`).save(Buffer.from(imageString, 'base64'))
-
-    const imageUrl = await bucket.file(`${parcelId}.jpg`).getSignedUrl({action: 'read', expires: dateFns.add(new Date(), {days: 1})})
 
     const ocrRes = await fetch(`${process.env.OCR_GS}?${queryStringify({imageurl: imageUrl})}`)
 

@@ -46,7 +46,6 @@ const https_1 = __importDefault(require("https"));
 const axios_1 = __importDefault(require("axios"));
 const cors_1 = __importDefault(require("cors"));
 const crypto_1 = __importDefault(require("crypto"));
-const dateFns = __importStar(require("date-fns"));
 const fst = __importStar(require("./firestoreoperation"));
 const msg = __importStar(require("./message"));
 //set port
@@ -448,7 +447,7 @@ app.post('/adminapp/ocr', (req, res) => __awaiter(void 0, void 0, void 0, functi
     let data;
     try {
         data = req.body;
-        if (!data.sessionid || !data.imageString) {
+        if (!data.sessionid || !data.imageUrl || !data.parcelId) {
             throw new Error('Invalid data (trace: adminapp/ocr)');
         }
     }
@@ -458,7 +457,7 @@ app.post('/adminapp/ocr', (req, res) => __awaiter(void 0, void 0, void 0, functi
         console.log(err);
         return;
     }
-    const { sessionid, imageString } = data;
+    const { sessionid, imageUrl, parcelId } = data;
     const docRef = db.collection('activeMobileSession');
     const snapshot = yield docRef.where('id', '==', sessionid).get();
     if (snapshot.empty) {
@@ -469,9 +468,6 @@ app.post('/adminapp/ocr', (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(500).json({ message: "Internal Server Error (trace: adminadd/ocr dupesession)" });
         return;
     }
-    const parcelId = (0, uuid_1.v4)();
-    yield bucket.file(`${parcelId}.jpg`).save(Buffer.from(imageString, 'base64'));
-    const imageUrl = yield bucket.file(`${parcelId}.jpg`).getSignedUrl({ action: 'read', expires: dateFns.add(new Date(), { days: 1 }) });
     const ocrRes = yield fetch(`${process.env.OCR_GS}?${(0, node_querystring_1.stringify)({ imageurl: imageUrl })}`);
     if (ocrRes.status !== 200) {
         res.status(500).json({ status: 500, message: "Internal Server Error (trace: ocr req)" });
