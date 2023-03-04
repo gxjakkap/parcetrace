@@ -490,9 +490,6 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
         res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
     }
 
-    
-    ocrText = ocrText.substring(2)
-
     res.status(200).json({status: 200, text: ocrText, id: parcelId})
 })
 
