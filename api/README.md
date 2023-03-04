@@ -8,7 +8,9 @@ Express app built with Typescript.
 
 2. Create a LINE bot and gather its Channel Access Token.
 
-3. Run Express app.
+3. Compile ts files to js. Run `tsc` in `/api` directory.
+
+4. Run Express app.
 
 To run this app, there are a few environment variables that needed to be passed.
 
@@ -20,6 +22,8 @@ To run this app, there are a few environment variables that needed to be passed.
 
 * CAT: LINE bot's channel access token.
 
-Then run the app in the `dist/` folder. (You can compile it yourself. I just include the compiled file here because my test server couldn't compile without hanging.)
+* OCR_GS: Google Apps Script OCR path
 
-`$ sudo API_KEY=apikey port=443 cred=/path/to/file.json CAT=channelaccesstoken node dist/app.js`
+Then run the app in the `dist/` folder.
+
+`$ sudo API_KEY=apikey port=443 cred=/path/to/file.json CAT=channelaccesstoken OCR_GS=ocrscriptlink node dist/app.js`
