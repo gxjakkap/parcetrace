@@ -475,6 +475,8 @@ app.post('/adminapp/ocr', (req, res) => __awaiter(void 0, void 0, void 0, functi
             res.status(500).json({ status: 500, message: "Internal Server Error (trace: ocr req)" });
             return;
         }
+        console.log(ocrRes);
+        console.log(typeof ocrRes);
         ocrText = ocrRes.toString();
     }
     catch (e) {

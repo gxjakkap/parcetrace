@@ -483,6 +483,8 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
             res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
             return
         }
+        console.log(ocrRes)
+        console.log(typeof ocrRes)
         ocrText = ocrRes.toString()
     }
     catch(e){
