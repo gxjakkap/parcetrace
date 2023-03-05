@@ -10,7 +10,7 @@ export const ggAppsScript = async (imageUrl: string) => {
 }
 
 export const easyOCR = async (imageUrl: string) => {
-    const ocrRes = await axios.post('http://localhost:3487/easyocr', { image: imageUrl }, {headers: {'Content-Type': 'application/json'}})
+    const ocrRes = await axios.post('http://127.0.0.1:3487/easyocr', { image: imageUrl }, {headers: {'Content-Type': 'application/json'}})
     return ocrRes.data.toString()
 }
 
