@@ -10,6 +10,7 @@ import cors from 'cors'
 import crypto from 'crypto'
 import * as fst from './firestoreoperation'
 import * as msg from './message'
+import * as ocrW from './ocr'
 
 //set port
 const port = process.env.port || 3000
@@ -439,7 +440,7 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
     let data: any
     try {
         data = req.body
-        if (!data.sessionid || !data.imageUrl || !data.parcelId) {
+        if (!data.sessionid || !data.imageUrl || !data.parcelId || !data.mode) {
             throw new Error('Invalid data (trace: adminapp/ocr)')
         }
 
@@ -451,7 +452,7 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
         return
     }
 
-    const { sessionid, imageUrl, parcelId } = data
+    const { sessionid, imageUrl, parcelId, mode } = data
 
     const docRef = db.collection('activeMobileSession')
 
@@ -469,17 +470,28 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
 
     let ocrText = ""
 
-    try {
-        const ocrRes = await axios.get(`${process.env.OCR_GS}?${queryStringify({imageurl: imageUrl})}`)
-        if (ocrRes.status !== 200){
-            res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
+    switch (mode){
+        case 'ggapps':
+            try {
+                ocrText = await ocrW.ggAppsScript(imageUrl)
+            }
+            catch(e){
+                console.log(e)
+                res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
+            }
+            break
+        case 'easyocr':
+            try {
+                ocrText = await ocrW.easyOCR(imageUrl)
+            }
+            catch(e){
+                console.log(e)
+                res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
+            }
+            break
+        default:
+            res.status(500).json({status: 400, message: "Bad request (invalid mode)"})
             return
-        }
-        ocrText = ocrRes.data.toString()
-    }
-    catch(e){
-        console.log(e)
-        res.status(500).json({status: 500, message: "Internal Server Error (trace: ocr req)"})
     }
 
     res.status(200).json({status: 200, text: ocrText, id: parcelId})
