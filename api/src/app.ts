@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
-import { getStorage } from 'firebase-admin/storage'
 import { v4 as uuidv4 } from 'uuid';
 import { stringify as queryStringify } from 'node:querystring';
 import fs from 'fs'
@@ -9,7 +8,6 @@ import https from 'https'
 import axios from 'axios'
 import cors from 'cors'
 import crypto from 'crypto'
-import * as dateFns from 'date-fns'
 import * as fst from './firestoreoperation'
 import * as msg from './message'
 
@@ -27,7 +25,6 @@ initializeApp({
 })
 
 const db = getFirestore()
-const bucket = getStorage().bucket()
 
 //https
 const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
@@ -61,7 +58,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 })
 
 //webhook path
-app.post('/webhook', (req: Request, res: Response) => {
+app.post('/webhook', async (req: Request, res: Response) => {
     const body = req.body
     if (body.events) {
         for (let i = 0; i < body.events.length; i++) {
@@ -71,16 +68,19 @@ app.post('/webhook', (req: Request, res: Response) => {
             *   - send greeting message
             */
             if (body.events[i].type === 'follow') {
-                axios.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`, {
+                const getRes = await axios.get(`https://api.line.me/v2/bot/profile/${body.events[i].source.userId}`, {
                     headers: {  
                         Authorization: `Bearer ${channelAccessToken}`
                     }
                 })
-                    .then(data => {
-                        msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
-                        const docRef = db.collection('users').doc(body.events[i].source.userId as string)
-                        fst.dbSetOnFollow(docRef, { userId: data.data.userId, lineData: {displayName: data.data.displayName, picLink: data.data.pictureUrl}, isRegistered: false }).catch(err => { console.log(err) })
-                    })
+                if (getRes.status !== 200){
+                    console.log("Webhook Error: ")
+                    console.log(getRes.data)
+                }
+                const { data } = getRes
+                msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
+                const docRef = db.collection('users').doc(body.events[i].source.userId as string)
+                fst.dbSetOnFollow(docRef, { userId: data.data.userId, lineData: {displayName: data.data.displayName, picLink: data.data.pictureUrl}, isRegistered: false }).catch(err => { console.log(err) })
             }
             /*
             *   Unfollow event
@@ -127,7 +127,7 @@ app.post('/parcelreg', (req: Request, res: Response) => {
         .catch(err => { console.log(err); res.status(500).json({ status: 500, message: 'Internal Server Error' }); return })
 })
 
-app.post('/userreg', (req: Request, res: Response) => {
+app.post('/userreg', async (req: Request, res: Response) => {
     //TODO: remove console.log
 
     //check for api key
@@ -150,34 +150,31 @@ app.post('/userreg', (req: Request, res: Response) => {
         return
     }
     const docRef = db.collection('users').doc(data.userId)
-    fst.checkForRegistrationEligibility(docRef)
-        .then(eligible => {
-            if (eligible){
-                fst.dbSetOnUserRegister(docRef, data)
-                    .then(() => {
-                        console.log('user registered')
-                        msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
-                            .then(() => {
-                                console.log('user notified about a successful registration')
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
-                        res.status(200).json({ status: 200, message: "User registered" })
-                    })
-                    .catch(err => {
-                        console.log(err)
-                        res.status(500).json({ status: 500, message: "Internal Server Error" })
-                    })
-            }
-            else {
-                res.status(403).json({ status: 403, message: "Forbidden. Either user isn't a friend yet or user is already registered." }) 
-            }
-        })
+    const checkRegis = await fst.checkForRegistrationEligibility(docRef)
+    if (!checkRegis){
+        res.status(403).json({ status: 403, message: "Forbidden. Either user isn't a friend yet or user is already registered." }) 
+    }
+
+    try {
+        await fst.dbSetOnUserRegister(docRef, data)
+        console.log('user registered')
+        try {
+            await msg.sendRegistrationConfirmMessage(data.userId as string, channelAccessToken as string, data)
+            console.log('user notified about a successful registration')
+        }
+        catch (e) {
+            console.log(e)
+        }
+        res.status(200).json({ status: 200, message: "User registered" })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ status: 500, message: "Internal Server Error" })
+    }
 })
 
 //get user id
-app.get('/getUserId', (req: Request, res: Response) => {
+app.get('/getUserId', async (req: Request, res: Response) => {
     if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" })
         console.log('Unauthorized request recieved')
@@ -189,24 +186,24 @@ app.get('/getUserId', (req: Request, res: Response) => {
     }
     const phoneNumber = req.query.phoneNo as string
     const collectionRef = db.collection('users')
-    fst.findUserWithPhoneNumber(collectionRef, phoneNumber)
-        .then(response => {
-            if (response.successful) {
-                if (response.statusCode === 200) {
-                    res.status(200).json({ status: 200, userId: response.userId })
-                }
-                else {
-                    res.status(500).json({ status: 500, message: "Internal Server Error" })
-                }
+    try {
+        const response = await fst.findUserWithPhoneNumber(collectionRef, phoneNumber)
+        if (response.successful) {
+            if (response.statusCode === 200) {
+                res.status(200).json({ status: 200, userId: response.userId })
             }
             else {
-                res.status(response.statusCode).json({ status: response.statusCode, message: response.errorMessage })
+                res.status(500).json({ status: 500, message: "Internal Server Error" })
             }
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).json({ status: 500, message: "Internal Server Error" })
-        })
+        }
+        else {
+            res.status(response.statusCode).json({ status: response.statusCode, message: response.errorMessage })
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ status: 500, message: "Internal Server Error" })
+    }
 })
 
 app.get('/parcelcheck', (req: Request, res: Response) => {
@@ -293,7 +290,7 @@ app.get('/getparceldata', (req: Request, res: Response) => {
 })
 
 //parcel delete method
-app.post('/parcelrem', (req: Request, res: Response) => {
+app.post('/parcelrem', async (req: Request, res: Response) => {
     //check for api key
     if (req.headers.authorization !== API_KEY) {
         res.status(401).json({ status: 401, message: "Unauthorized" })
@@ -317,32 +314,31 @@ app.post('/parcelrem', (req: Request, res: Response) => {
     }
 
     const docRef = db.collection('allActiveParcel').doc(data.parcelId)
-    fst.getParcelDataFromAllParcel(docRef)
-        .then(pData => {
-            if (!pData) {
-                res.status(404).json({ status: 404, message: "Parcel not found" })
-                return
-            }
-            console.log('parcel data found')
-            const userId = pData.userId
-            const userDocRef = db.collection('users').doc(userId)
-            fst.getUserActiveParcels(userDocRef)
-                .then(returnedData => {
-                    if (returnedData?.activeParcel.length > 0) {
-                        fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId))
-                        fst.dbRemoveParcelFromUserData(userDocRef, data.parcelId)
-                        res.status(200).json({ status: 200, message: "Parcel deleted" })
-                    }
-                    else {
-                        console.log('no active parcels found')
-                        res.status(404).json({ status: 404, message: "No active parcels found" })
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                    res.status(500).json({ status: 500, message: "Internal Server Error" })
-                })
-        })
+    const pData = await fst.getParcelDataFromAllParcel(docRef)
+    if (!pData) {
+        res.status(404).json({ status: 404, message: "Parcel not found" })
+        return
+    }
+    console.log('parcel data found')
+    const userId = pData.userId
+    const userDocRef = db.collection('users').doc(userId)
+    try {
+        const userActiveParcels = await fst.getUserActiveParcels(userDocRef)
+        if (userActiveParcels?.activeParcel.length > 0) {
+            fst.dbRemoveDoc(db.collection('allActiveParcel').doc(data.parcelId))
+            fst.dbRemoveParcelFromUserData(userDocRef, data.parcelId)
+            res.status(200).json({ status: 200, message: "Parcel deleted" })
+        }
+        else {
+            console.log('no active parcels found')
+            res.status(404).json({ status: 404, message: "No active parcels found" })
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ status: 500, message: "Internal Server Error" })
+    }
+
 })
 
 /**  registering mobile device for the first time, the flow is
@@ -400,7 +396,7 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
  * Remove session aka. logout.
  * remove that session from the database. 
  */
- app.post('/adminapp/logout', (req: Request, res: Response) => {
+ app.post('/adminapp/logout', async (req: Request, res: Response) => {
     let data: any
     try {
         data = req.body
@@ -416,31 +412,27 @@ app.post('/adminapp/authen', (req: Request, res: Response) => {
         return
     }
 
-
     const docRef = db.collection('activeMobileSession')
+    const snapshot = await docRef.where('id', '==', data.sessionid).get()
+    if (snapshot.empty){
+        res.status(404).json({message: "Session doesn't exist"})
+        return
+    }
 
-    docRef.where('id', '==', data.sessionid).get()
-        .then(snapshot => {
-            if (snapshot.empty){
-                res.status(404).json({message: "Session doesn't exist"})
-                return
-            }
+    if (snapshot.size > 1){
+        res.status(500).json({ message: "Internal Server Error"})
+        return
+    }
 
-            if (snapshot.size > 1){
-                res.status(500).json({ message: "Internal Server Error"})
-                return
-            }
-
-            db.collection('activeMobileSession').doc(snapshot.docs[0].id).delete()
-                .then(x => {
-                    res.status(200).json({message: "Success"})
-                })
-                .catch(err => {
-                    res.status(500).json({ message: "Internal Server Error"})
-                })
-
-        })
-   
+    try {
+        await db.collection('activeMobileSession').doc(snapshot.docs[0].id).delete()
+        res.status(200).json({message: "Success"})
+    }
+    catch (err){
+        console.log(err)
+        res.status(500).json({ message: "Internal Server Error"})
+    }
+    
 })
 
 app.post('/adminapp/ocr', async (req: Request, res: Response) => {
