@@ -1,6 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, View, Image, NativeSyntheticEvent, ImageLoadEventData } from 'react-native';
 import { ToastBannerProvider, ToastBannerPresenter, useToastBannerToggler, Transition } from 'react-native-toast-banner';
+import { utils } from '@react-native-firebase/app';
+import { v4 as uuidv4 } from 'uuid';
+import storage from '@react-native-firebase/storage';
 import TextRecognition from '@react-native-ml-kit/text-recognition';
 import * as SecureStore from 'expo-secure-store';
 import * as React from 'react';
@@ -36,7 +39,14 @@ export default function OCRTestPage ({ navigation, route }: Props){
         console.log(`failed to load media: ${JSON.stringify(error)}`);
     }, []);
 
+    const uploadImage = (imagePath: string) => {
+        const id = uuidv4()
+        const reference = storage().ref(`user_parcels/${id}.jpg`);
+        return reference.putFile(imagePath)
+    }
+
     const recog = async(imageUrl: string) => {
+        const upload = uploadImage(imageUrl)
         const result = await TextRecognition.recognize(imageUrl)
         setRecogResult(result.text)
     }

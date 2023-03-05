@@ -1,0 +1,39 @@
+{
+    "project_info": {
+      "project_number": "610345527016",
+      "project_id": "parcetrace",
+      "storage_bucket": "parcetrace.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:610345527016:android:854c05e78427f1c0754b5d",
+          "android_client_info": {
+            "package_name": "me.guntxjakka.parcetracenative"
+          }
+        },
+        "oauth_client": [
+          {
+            "client_id": "610345527016-55d6jl1jpkvkong5baucfaptmmv9ie6k.apps.googleusercontent.com",
+            "client_type": 3
+          }
+        ],
+        "api_key": [
+          {
+            "current_key": "AIzaSyBnCvMz-KHO5UTy36LftfM6IF1-X2EoYK0"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": [
+              {
+                "client_id": "610345527016-55d6jl1jpkvkong5baucfaptmmv9ie6k.apps.googleusercontent.com",
+                "client_type": 3
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }
