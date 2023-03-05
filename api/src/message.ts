@@ -43,7 +43,7 @@ export async function sendParcelNotificationMessage(userId: string, channelAcces
 export async function sendParcelNotificationMessageNew(userId: string, channelAccessToken: string, parcelData: userParcel) {
     const message: TemplateMessage = {
         "type": "template",
-        "altText": "การแจ้งเตือนพัสดุ",
+        "altText": `พัสดุจาก ${parcelData.sender}`,
         "template": {
           "type": "buttons",
           "imageAspectRatio": "rectangle",
