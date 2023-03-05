@@ -17,7 +17,7 @@ def eocr_getTextResults(raw):
 
 @app.route('/easyocr', methods=['POST'])
 def eocr():
-    print(request)
+    print(request.values)
     data = request.json
     result = reader.readtext(data['image'])
     return jsonify(status=200, data=eocr_getTextResults(result))
