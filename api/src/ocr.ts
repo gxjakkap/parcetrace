@@ -8,7 +8,7 @@ export const ggAppsScript = async (imageUrl: string) => {
     }
     let data: string = ocrRes.data.toString()
     if (data.startsWith("\n")){
-        data = data.substring(2)
+        data = data.substring(1)
     }
     const dataArr = data.split("\n")
     return dataArr
