@@ -503,7 +503,7 @@ app.post('/adminapp/userlookup', async(req: Request, res: Response) => {
     let data: any
     try {
         data = req.body
-        if (!data.sessionid || (!data.nameQuery || !data.fullNameQuery || !data.phoneQuery)) {
+        if (!data.sessionid || (!data.nameQuery && !data.fullNameQuery && !data.phoneQuery)) {
             throw new Error('Invalid data (trace: adminapp/userlookup)')
         }
 
