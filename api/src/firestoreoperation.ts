@@ -181,7 +181,7 @@ export const adminAppFindUserWithFullname = async (collection: FirebaseFirestore
 }
 
 export const adminAppFindUserWithPhoneNumber = async (collection: FirebaseFirestore.CollectionReference, phoneNumber: string) => {
-    const snapshot = await collection.where('phoneNo', '==', phoneNumber).get()
+    const snapshot = await collection.where('phoneNumber', '==', phoneNumber).get()
     let response: findUserResponse = { successful: false, statusCode: 500 }
     if (!snapshot.empty) {
         let dataArray: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[] = []
