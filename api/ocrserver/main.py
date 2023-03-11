@@ -20,6 +20,7 @@ def eocr():
     print(request)
     data = request.json
     result = reader.readtext(data['image'])
+    print(result)
     return jsonify(status=200, data=eocr_getTextResults(result))
 
 @app.route('/', methods=['GET'])
