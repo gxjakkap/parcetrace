@@ -569,11 +569,14 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
     let body: any
     try {
         body = req.body
-        if (!body.sender || !body.location || !body.userId  || !body.sessionid) throw Error('value missing')
+        if (!body.sender || !body.location || !body.userId  || !body.sessionid){
+            throw Error('value missing')
+        }
     }
     catch (err) {
         console.log(err)
         res.status(400).json({ status: 400, message: 'bad request' })
+        return
     }
 
     console.log(body)
