@@ -6,7 +6,12 @@ export const ggAppsScript = async (imageUrl: string) => {
     if (ocrRes.status !== 200){
         throw Error('Response Error: ggApps OCR')
     }
-    return ocrRes.data.toString()
+    let data: string = ocrRes.data.toString()
+    if (data.startsWith("\n")){
+        data = data.substring(2)
+    }
+    const dataArr = data.split("\n")
+    return dataArr
 }
 
 export const easyOCR = async (imageUrl: string) => {
