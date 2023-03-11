@@ -567,14 +567,14 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
     let body: any
     try {
         body = req.body
-        if (!body.sender || !body.location || !body.userId || !body.parcelId || !body.sessionid) throw Error('value missing')
+        if (!body.sender || !body.location || !body.userId  || !body.sessionid) throw Error('value missing')
     }
     catch (err) {
         console.log(err)
         res.status(400).json({ status: 400, message: 'bad request' })
     }
 
-    const { sender, location, userId, parcelId, sessionid } = body
+    const { sender, location, userId, sessionid } = body
 
     const docRef = db.collection('activeMobileSession')
 
@@ -592,8 +592,9 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
 
     console.log(body)
     const date = new Date
+    const parcelId = uuidv4()
     const dataForUser: fst.userParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, location: location }
-    const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: userId, userId: userId, location: location }
+    const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, userId: userId, location: location }
     const userRef = db.collection('users').doc(body.userId as string)
     const allActiveRef = db.collection('allActiveParcel').doc(body.userId as string)
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
