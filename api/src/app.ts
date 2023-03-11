@@ -574,6 +574,8 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
         res.status(400).json({ status: 400, message: 'bad request' })
     }
 
+    console.log(body)
+
     const { sender, location, userId, sessionid } = body
 
     const docRef = db.collection('activeMobileSession')
@@ -595,6 +597,8 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
     const parcelId = uuidv4()
     const dataForUser: fst.userParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, location: location }
     const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, userId: userId, location: location }
+    console.log(dataForUser)
+    console.log(dataForAllActive)    
     const userRef = db.collection('users').doc(body.userId as string)
     const allActiveRef = db.collection('allActiveParcel').doc(body.userId as string)
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
