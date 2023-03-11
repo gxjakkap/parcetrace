@@ -98,6 +98,7 @@ app.post('/webhook', async (req: Request, res: Response) => {
     res.status(200).json({})
 })
 
+//deprecated
 //parcel register path
 app.post('/parcelreg', (req: Request, res: Response) => {
     //check for api key
@@ -498,6 +499,105 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
     res.status(200).json({status: 200, text: ocrText, id: parcelId})
 })
 
+app.post('/adminapp/userlookup', async(req: Request, res: Response) => {
+    let data: any
+    try {
+        data = req.body
+        if (!data.sessionid || (!data.nameQuery || !data.fullNameQuery || !data.phoneQuery)) {
+            throw new Error('Invalid data (trace: adminapp/userlookup)')
+        }
+
+    }
+    catch (err) {
+        res.status(400).json({ status: 400, message: "Bad Request" })
+        console.log('Bad request recieved')
+        console.log(err)
+        return
+    }
+
+    const { sessionid, nameQuery, fullNameQuery, phoneQuery } = data
+
+    const docRef = db.collection('activeMobileSession')
+
+    const snapshot = await docRef.where('id', '==', sessionid).get()
+
+    if (snapshot.empty){
+        res.status(401).json({message: "Session doesn't exist"})
+        return
+    }
+
+    if (snapshot.size > 1){
+        res.status(500).json({ message: "Internal Server Error (trace: adminadd/userlookup dupesession)"})
+        return
+    }
+
+    const userDocRef = db.collection('users')
+
+    if (phoneQuery){
+        const q = await fst.adminAppFindUserWithPhoneNumber(userDocRef, phoneQuery)
+        if (q.statusCode !== 200){
+            res.status(q.statusCode).json({ message: q.errorMessage})
+        }
+        res.status(200).json({ user: q.user })
+    }
+    else if (fullNameQuery){
+        const q = await fst.adminAppFindUserWithFullname(userDocRef, fullNameQuery)
+        if (q.statusCode !== 200){
+            res.status(q.statusCode).json({ message: q.errorMessage})
+        }
+        res.status(200).json({ user: q.user })
+    }
+    else {
+        const q = await fst.adminAppFindUserWithFirstName(userDocRef, nameQuery)
+        if (q.statusCode !== 200){
+            res.status(q.statusCode).json({ message: q.errorMessage})
+        }
+        res.status(200).json({ user: q.user })
+    }
+
+})
+
+//parcel register path
+app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
+    let body: any
+    try {
+        body = req.body
+        if (!body.sender || !body.location || !body.userId || !body.parcelId || !body.sessionid) throw Error('value missing')
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).json({ status: 400, message: 'bad request' })
+    }
+
+    const { sender, location, userId, parcelId, sessionid } = body
+
+    const docRef = db.collection('activeMobileSession')
+
+    const snapshot = await docRef.where('id', '==', sessionid).get()
+
+    if (snapshot.empty){
+        res.status(401).json({message: "Session doesn't exist"})
+        return
+    }
+
+    if (snapshot.size > 1){
+        res.status(500).json({ message: "Internal Server Error (trace: adminadd/ocr dupesession)"})
+        return
+    }
+
+    console.log(body)
+    const date = new Date
+    const dataForUser: fst.userParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, location: location }
+    const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: userId, userId: userId, location: location }
+    const userRef = db.collection('users').doc(body.userId as string)
+    const allActiveRef = db.collection('allActiveParcel').doc(body.userId as string)
+    fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
+        .then(() => {
+            msg.sendParcelNotificationMessageNew(body.userId, channelAccessToken as string, dataForUser)
+            res.status(200).json({ status: 200, message: 'Parcel registered' })
+        })
+        .catch(err => { console.log(err); res.status(500).json({ status: 500, message: 'Internal Server Error' }); return })
+})
 
 https.createServer(sslCredentials, app)
     .listen(port, () => {console.log(`App listening on port ${port}`)})

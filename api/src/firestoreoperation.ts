@@ -55,6 +55,13 @@ interface findUserWithPhoneNumberResponse {
     userId?: string
 }
 
+interface findUserResponse {
+    successful: boolean,
+    statusCode: number,
+    errorMessage?: string,
+    user?: userData
+}
+
 export const dbSetOnFollow = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>, data: userDataPreRegis) => {
     await ref.set(data)
 }
@@ -139,6 +146,104 @@ export const findUserWithPhoneNumber = async (collection: FirebaseFirestore.Coll
     return response
 }
 
+export const adminAppFindUserWithFullname = async (collection: FirebaseFirestore.CollectionReference, fullNameString: string) => {
+    const fullName = fullNameString.split(" ")
+
+    const snapshot = await collection.where('name', '==', fullName[0]).where('surname', '==', fullName[1]).get()
+    let response: findUserResponse = { successful: false, statusCode: 500 }
+    if (!snapshot.empty) {
+        let dataArray: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[] = []
+        snapshot.forEach(doc => {
+            dataArray.push(doc)
+        })
+        if (dataArray.length > 1) {
+            response.errorMessage = "User Duplication!"
+        }
+        else if (dataArray.length == 1) {
+            response.successful = true
+            response.statusCode = 200
+            response.user = dataArray[0].data() as userData
+        }
+        else if (dataArray.length == 0) {
+            response.successful = true
+            response.statusCode = 404
+        }
+        else {
+            response.statusCode = 500
+            response.errorMessage = "Internal server error."
+        }
+    }
+    else {
+        response.statusCode = 404
+        response.errorMessage = "User not found."
+    }
+    return response
+}
+
+export const adminAppFindUserWithPhoneNumber = async (collection: FirebaseFirestore.CollectionReference, phoneNumber: string) => {
+    const snapshot = await collection.where('phoneNo', '==', phoneNumber).get()
+    let response: findUserResponse = { successful: false, statusCode: 500 }
+    if (!snapshot.empty) {
+        let dataArray: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[] = []
+        snapshot.forEach(doc => {
+            dataArray.push(doc)
+        })
+        if (dataArray.length > 1) {
+            response.errorMessage = "User Duplication!"
+        }
+        else if (dataArray.length == 1) {
+            response.successful = true
+            response.statusCode = 200
+            response.user = dataArray[0].data() as userData
+        }
+        else if (dataArray.length == 0) {
+            response.successful = true
+            response.statusCode = 404
+        }
+        else {
+            response.statusCode = 500
+            response.errorMessage = "Internal server error."
+        }
+    }
+    else {
+        response.statusCode = 404
+        response.errorMessage = "User not found."
+    }
+    return response
+}
+
+export const adminAppFindUserWithFirstName = async (collection: FirebaseFirestore.CollectionReference, firstName: string) => {
+    const snapshot = await collection.where('name', '==', firstName).get()
+    let response: findUserResponse = { successful: false, statusCode: 500 }
+    if (!snapshot.empty) {
+        let dataArray: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[] = []
+        snapshot.forEach(doc => {
+            dataArray.push(doc)
+        })
+        if (dataArray.length > 1) {
+            response.errorMessage = "User Duplication!"
+        }
+        else if (dataArray.length == 1) {
+            response.successful = true
+            response.statusCode = 200
+            response.user = dataArray[0].data() as userData
+        }
+        else if (dataArray.length == 0) {
+            response.successful = true
+            response.statusCode = 404
+        }
+        else {
+            response.statusCode = 500
+            response.errorMessage = "Internal server error."
+        }
+    }
+    else {
+        response.statusCode = 404
+        response.errorMessage = "User not found."
+    }
+    return response
+}
+
 export const getUserActiveParcels = async (ref: FirebaseFirestore.DocumentReference<FirebaseFirestore.DocumentData>) => {
     const doc = await ref.get()
     if (doc.exists) {
@@ -179,5 +284,5 @@ export const getAllParcel = async (allRef:FirebaseFirestore.CollectionReference<
     return ansArr
 }
 
-export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber, getAllParcel }
+export default { dbSetOnFollow, dbRemoveOnUnfollow, dbRemoveDoc, dbSetOnParcelRegister, dbSetOnUserRegister, getParcelDataFromAllParcel, getUserActiveParcels, checkIfDocumentExist, findUserWithPhoneNumber, getAllParcel, adminAppFindUserWithFirstName, adminAppFindUserWithFullname, adminAppFindUserWithPhoneNumber }
 export type { userParcel, allParcel, userData }
