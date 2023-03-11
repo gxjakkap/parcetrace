@@ -468,7 +468,7 @@ app.post('/adminapp/ocr', async (req: Request, res: Response) => {
         return
     }
 
-    let ocrText = ""
+    let ocrText
 
     switch (mode){
         case 'ggapps':
