@@ -515,6 +515,8 @@ app.post('/adminapp/userlookup', async(req: Request, res: Response) => {
         return
     }
 
+    console.log(data)
+
     const { sessionid, nameQuery, fullNameQuery, phoneQuery } = data
 
     const docRef = db.collection('activeMobileSession')
@@ -537,6 +539,7 @@ app.post('/adminapp/userlookup', async(req: Request, res: Response) => {
         const q = await fst.adminAppFindUserWithPhoneNumber(userDocRef, phoneQuery)
         if (q.statusCode !== 200){
             res.status(q.statusCode).json({ message: q.errorMessage})
+            return
         }
         res.status(200).json({ user: q.user })
     }
@@ -544,6 +547,7 @@ app.post('/adminapp/userlookup', async(req: Request, res: Response) => {
         const q = await fst.adminAppFindUserWithFullname(userDocRef, fullNameQuery)
         if (q.statusCode !== 200){
             res.status(q.statusCode).json({ message: q.errorMessage})
+            return
         }
         res.status(200).json({ user: q.user })
     }
@@ -551,6 +555,7 @@ app.post('/adminapp/userlookup', async(req: Request, res: Response) => {
         const q = await fst.adminAppFindUserWithFirstName(userDocRef, nameQuery)
         if (q.statusCode !== 200){
             res.status(q.statusCode).json({ message: q.errorMessage})
+            return
         }
         res.status(200).json({ user: q.user })
     }
