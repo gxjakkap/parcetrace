@@ -27,6 +27,8 @@ initializeApp({
 
 const db = getFirestore()
 
+db.settings({ ignoreUndefinedProperties: true })
+
 //https
 const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
 const sslCertificate = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
