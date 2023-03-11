@@ -599,8 +599,8 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
     const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, userId: userId, location: location }
     console.log(dataForUser)
     console.log(dataForAllActive)    
-    const userRef = db.collection('users').doc(body.userId as string)
-    const allActiveRef = db.collection('allActiveParcel').doc(body.userId as string)
+    const userRef = db.collection('users').doc(userId as string)
+    const allActiveRef = db.collection('allActiveParcel').doc(userId as string)
     fst.dbSetOnParcelRegister(userRef, dataForUser, allActiveRef, dataForAllActive)
         .then(() => {
             msg.sendParcelNotificationMessageNew(body.userId, channelAccessToken as string, dataForUser)
