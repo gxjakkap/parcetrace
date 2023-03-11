@@ -595,8 +595,12 @@ app.post('/adminapp/parcelreg', async (req: Request, res: Response) => {
     }
 
     console.log(body)
+    console.log(location)
+    console.log(sender)
+    console.log(userId)
     const date = new Date
     const parcelId = uuidv4()
+    console.log(parcelId)
     const dataForUser: fst.userParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, location: location }
     const dataForAllActive: fst.allParcel = { status: 'available', date: date.getTime(), sender: sender, parcelId: parcelId, userId: userId, location: location }
     console.log(dataForUser)
