@@ -56,12 +56,12 @@ export async function sendParcelNotificationMessageNew(userId: string, channelAc
               "type": "uri",
               "label": "ยืนยันการรับพัสดุ",
               "uri": `${baseUrl}confirmation?pid=${parcelData.parcelId}`
-            },
+            }/* ,
             {
                 "type": "uri",
                 "label": "ดูรูปภาพพัสดุ",
                 "uri": `${parcelPlaceholder}`
-              }
+              } */
           ]
         }
       }
