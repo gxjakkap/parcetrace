@@ -82,9 +82,9 @@ app.post('/webhook', async (req: Request, res: Response) => {
                 }
                 const { data } = getRes
                 console.log(data)
-                msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.data.displayName).catch(err => { console.log(err) })
+                msg.sendGreetingMessage(body.events[i].source.userId, channelAccessToken as string, data.displayName).catch(err => { console.log(err) })
                 const docRef = db.collection('users').doc(body.events[i].source.userId as string)
-                fst.dbSetOnFollow(docRef, { userId: data.data.userId, lineData: {displayName: data.data.displayName, picLink: data.data.pictureUrl}, isRegistered: false }).catch(err => { console.log(err) })
+                fst.dbSetOnFollow(docRef, { userId: data.userId, lineData: {displayName: data.displayName, picLink: data.pictureUrl}, isRegistered: false }).catch(err => { console.log(err) })
             }
             /*
             *   Unfollow event
