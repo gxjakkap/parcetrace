@@ -2,7 +2,8 @@ name: ocr-docker
 on:
   push:
     paths:
-      - 'ocr/ocrserver/*'
+      - 'ocr/ocrserver/**/*'
+      - '.github/workflows/ocr-docker.yml'
 jobs:
   publish-parcetrace-ocr:
     runs-on: ubuntu-latest
