@@ -49,11 +49,10 @@ def tesseract():
     print(request)
     data = request.json
     image = imutils.url_to_image(data['image'])
+    if image.shape[0] > image.shape[1]:
+        image = imutils.rotate(image, angle=90)
     if eocr_imageSizeCap(image.shape):
-        if image.shape[0] > image.shape[1]:
-            image = imutils.resize(image, height=500)
-        else:
-            image = imutils.resize(image, width=500)
+        image = imutils.resize(image, width=500)
     result = pytesseract.image_to_string(image, lang='tha+eng')
     print(result)
     return jsonify(status=200, data=tsr_getTextResults(result))
