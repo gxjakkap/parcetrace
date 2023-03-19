@@ -19,6 +19,6 @@ jobs:
 
       - name: Build the hello-docker Docker image
         run: |
-              docker build . --tag ghcr.io/gxjakkap/parcetrace-ocr:latest
+              docker build ./ocr/ocrserver/ --tag ghcr.io/gxjakkap/parcetrace-ocr:latest
               docker run ghcr.io/gxjakkap/parcetrace-ocr:latest
               docker push ghcr.io/gxjakkap/parcetrace-ocr:latest
