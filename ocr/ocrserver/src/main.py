@@ -60,7 +60,7 @@ def tesseract():
 
 @app.route('/', methods=['GET'])
 def helloworld():
-    return jsonify(msg="Hello, world.")
+    return jsonify(msg="OCR Server running.")
 
 if __name__ == "__main__":
     from waitress import serve
