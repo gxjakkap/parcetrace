@@ -35,6 +35,10 @@ def eocr():
     print(request)
     data = request.json
     image = imutils.url_to_image(data['image'])
+    print(image.shape)
+    if image.shape[0] > image.shape[1]:
+        print('rotation occured')
+        image = imutils.rotate(image, angle=90)
     if eocr_imageSizeCap(image.shape):
         if image.shape[0] > image.shape[1]:
             image = imutils.resize(image, height=500)
@@ -49,7 +53,9 @@ def tesseract():
     print(request)
     data = request.json
     image = imutils.url_to_image(data['image'])
+    print(image.shape)
     if image.shape[0] > image.shape[1]:
+        print('rotation occured')
         image = imutils.rotate(image, angle=90)
     if eocr_imageSizeCap(image.shape):
         image = imutils.resize(image, width=500)
