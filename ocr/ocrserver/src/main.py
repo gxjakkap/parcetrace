@@ -38,7 +38,7 @@ def eocr():
     print(image.shape)
     if image.shape[0] > image.shape[1]:
         print('rotation occured')
-        image = imutils.rotate(image, angle=90)
+        image = imutils.rotate_bound(image, angle=270)
     if eocr_imageSizeCap(image.shape):
         if image.shape[0] > image.shape[1]:
             image = imutils.resize(image, height=500)
