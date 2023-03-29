@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View, Alert } from 'react-native';
+import { Button, StyleSheet, Text, View, Alert, Pressable, Linking } from 'react-native';
 import { ToastBannerProvider, ToastBannerPresenter, useToastBannerToggler, Transition } from 'react-native-toast-banner';
 import * as SecureStore from 'expo-secure-store';
 import * as React from 'react';
@@ -22,7 +22,6 @@ export default function DebugPage ({ navigation }: Props){
     }
 
     const forceLogout = async() => {
-        const sessionId = await SecureStore.getItemAsync('session')
         await SecureStore.deleteItemAsync('session')
         showBanner({
             contentView: <Text>Logged out!</Text>,
@@ -51,19 +50,26 @@ export default function DebugPage ({ navigation }: Props){
                     onPress: () => {}
                 }
             ]
-            )
+        )
     }
 
     return (
         <View className="flex-1 bg-white justify-center px-10">
-            <Text className="text-xl text-center">Home Page</Text>
-            <Button 
-                title="Force Logout"
+            <Text className="text-xl text-center mb-20">Settings and Debug</Text>
+            <Pressable
+                className='items-center justify-center py-5 px-[10] border-[4] mt-2 mb-2 bg-black rounded-xl'
                 onPress={() => {
                     forceLogoutAlert()
                 }}
             
-            />
+            ><Text className='text-white'>Force Logout</Text></Pressable>
+            <Pressable
+                className='items-center justify-center py-5 px-[10] border-[4] mt-2 mb-2 bg-black rounded-xl'
+                onPress={() => {
+                    Linking.openURL("https://raw.githubusercontent.com/gxjakkap/parcetrace/main/COPYING")
+                }}
+            
+            ><Text className='text-white'>License Agreement</Text></Pressable>
         </View>
     )
 }

@@ -154,7 +154,7 @@ const MediaPage = ({ navigation, route }: Props) => {
                 {savingState === 'saved' && <IonIcon name="checkmark" size={35} color="white" style={styles.icon} />}
                 {savingState === 'saving' && <ActivityIndicator color="white" />}
             </PressableOpacity>
-            <PressableOpacity className={`absolute bottom-[300] left-[${SAFE_AREA_PADDING.paddingLeft}] w-[40] h-[40]`} onPress={() => {navigation.navigate("OCRTestPage", {path: path})}}>
+            <PressableOpacity className={`absolute bottom-[300] left-[${SAFE_AREA_PADDING.paddingLeft}] w-[40] h-[40]`} onPress={() => {navigation.navigate("OCRPage", {path: path})}}>
                 <IonIcon name="document-text-outline" color="white" size={35}/>
             </PressableOpacity>
 

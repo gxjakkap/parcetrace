@@ -1,3 +1,8 @@
+interface dropdownItem {
+    label: string,
+    value: string
+}
+
 export type Routes = {
     WelcomePage: {} | undefined,
     Home: {} | undefined,
@@ -8,7 +13,11 @@ export type Routes = {
         path: string,
         type: 'video'|'photo'
     }
-    OCRTestPage: {
+    OCRPage: {
         path: string
+    }
+    ParcelAddPage: {
+        rawData: string[],
+        dropdownItems: dropdownItem[],
     }
 }

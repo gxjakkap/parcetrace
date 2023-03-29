@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import * as SecureStore from 'expo-secure-store';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { ToastBannerProvider, ToastBannerPresenter, useToastBannerToggler, Transition } from 'react-native-toast-banner';
 import * as React from 'react';
 
@@ -112,10 +112,10 @@ export default function WelcomePage ({navigation}: Props){
                 secureTextEntry={true}
                 onSubmitEditing={() => onFormSubmit()}
             />
-            <Button 
+            <Pressable
+            className='items-center justify-center py-5 px-[10] border-[4] mt-20 mb-2 bg-black rounded-xl'
                 onPress={() => onFormSubmit()}
-                title="Enter"
-            />
+            ><Text className='text-white'>Login</Text></Pressable>
             <StatusBar style="auto" />
         </View>
     )

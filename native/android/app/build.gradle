@@ -325,8 +325,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    classpath 'com.google.gms:google-services:4.3.15'
 }
 
 if (isNewArchitectureEnabled()) {
@@ -362,5 +360,3 @@ def isNewArchitectureEnabled() {
     // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
     return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
 }
-
-apply plugin: 'com.google.gms.google-services'

@@ -1,8 +1,10 @@
+import 'react-native-get-random-values';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ToastBannerProvider, ToastBannerPresenter } from 'react-native-toast-banner';
 import { Camera, CameraPermissionStatus } from 'react-native-vision-camera';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Provider as PaperProvider } from 'react-native-paper'
 import * as SecureStore from 'expo-secure-store';
 import * as React from 'react';
 
@@ -16,7 +18,8 @@ import MediaPage from './page/Media';
 import PermissionsPage from './page/Permission';
 import DebugPage from './page/Debug';
 
-import OCRTestPage from './page/OCRTest';
+import OCRPage from './page/OCR';
+import ParcelAddPage from './page/ParcelAdd';
 
 const Stack = createNativeStackNavigator();
 
@@ -56,39 +59,42 @@ export default function App(): React.ReactElement | null {
   
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <authState.Provider value={{ authenticated, setAuthenticated }}>
-        <permissionState.Provider value={{ permitted, setPermitted }}>
-          <ToastBannerProvider>
-            <NavigationContainer>
-              <Stack.Navigator screenOptions={{ headerShown: false, statusBarStyle: 'dark', animationTypeForReplace: 'push',}}>
-                {permitted ? (
-                  <>
-                  {authenticated ? (
-                      <>
-                        <Stack.Screen name="Home" component={Home} />
-                        <Stack.Screen name='CameraPage' component={CameraPage}/>
-                        <Stack.Screen name='DebugPage' component={DebugPage}/>
-                        <Stack.Screen name='MediaPage' component={MediaPage as any} options={{ animation: 'none', presentation: 'transparentModal',}}/>
-                        <Stack.Screen name='OCRTestPage' component={OCRTestPage as any} options={{ animation: 'none', presentation: 'transparentModal',}}/>
-                      </>
-                    ) :
-                    (
-                      <>
-                        <Stack.Screen name='WelcomePage' component={WelcomePage} />
-                      </>
-                    )
-                  }
-                </>
-                ) 
-                : <Stack.Screen name="PermissionPage" component={PermissionsPage} />}
-              </Stack.Navigator>
-              <ToastBannerPresenter />
-            </NavigationContainer>
-          </ToastBannerProvider>
-        </permissionState.Provider>
-      </authState.Provider>
-    </GestureHandlerRootView>
+   <PaperProvider>
+       <GestureHandlerRootView style={{ flex: 1 }}>
+        <authState.Provider value={{ authenticated, setAuthenticated }}>
+          <permissionState.Provider value={{ permitted, setPermitted }}>
+            <ToastBannerProvider>
+              <NavigationContainer>
+                <Stack.Navigator screenOptions={{ headerShown: false, statusBarStyle: 'dark', animationTypeForReplace: 'push',}}>
+                  {permitted ? (
+                    <>
+                    {authenticated ? (
+                        <>
+                          <Stack.Screen name="Home" component={Home} />
+                          <Stack.Screen name='CameraPage' component={CameraPage}/>
+                          <Stack.Screen name='DebugPage' component={DebugPage}/>
+                          <Stack.Screen name='MediaPage' component={MediaPage as any} options={{ animation: 'none', presentation: 'transparentModal',}}/>
+                          <Stack.Screen name='OCRPage' component={OCRPage as any} options={{ animation: 'none', presentation: 'transparentModal',}}/>
+                          <Stack.Screen name='ParcelAddPage' component={ParcelAddPage as any} />
+                        </>
+                      ) :
+                      (
+                        <>
+                          <Stack.Screen name='WelcomePage' component={WelcomePage} />
+                        </>
+                      )
+                    }
+                  </>
+                  ) 
+                  : <Stack.Screen name="PermissionPage" component={PermissionsPage} />}
+                </Stack.Navigator>
+                <ToastBannerPresenter />
+              </NavigationContainer>
+            </ToastBannerProvider>
+          </permissionState.Provider>
+        </authState.Provider>
+      </GestureHandlerRootView>
+   </PaperProvider>
   );
 }
 

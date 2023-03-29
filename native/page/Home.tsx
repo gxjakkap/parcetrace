@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ToastBannerProvider, ToastBannerPresenter, useToastBannerToggler, Transition } from 'react-native-toast-banner';
 import * as SecureStore from 'expo-secure-store';
 import * as React from 'react';
@@ -74,28 +74,16 @@ export default function Home ({ navigation }: Props){
 
     return (
         <View className="flex-1 bg-white justify-center px-10">
-            <Text className="text-xl text-center">Home Page</Text>
-            <Button 
-                title="Add Parcel"
-                onPress={() => {
-                   navigation.navigate("CameraPage")
-                }}
-            
-            />
-            <Button 
-                title="Debug Page"
-                onPress={() => {
-                   navigation.navigate("DebugPage")
-                }}
-            
-            />
-            <Button 
-                title="Logout"
-                onPress={() => {
-                    logout()
-                }}
-            
-            />
+            <Text className="text-3xl text-center">Parcetrace Home Page</Text>
+            <Pressable className='items-center justify-center py-5 px-[10] border-[4] mt-20 mb-2 bg-black rounded-xl' onPress={() => {navigation.navigate("CameraPage")}}>
+                <Text className='text-white'>Add Parcel</Text>
+            </Pressable>
+            <Pressable className='items-center justify-center py-5 px-[10] border-[4] my-2 bg-black rounded-xl' onPress={() => {navigation.navigate("DebugPage")}}>
+                <Text className='text-white'>Settings</Text>
+            </Pressable>
+            <Pressable className='items-center justify-center py-5 px-[10] border-[4] my- bg-black rounded-xl' onPress={() => {logout()}}>
+                <Text className='text-white'>Logout</Text>
+            </Pressable>
         </View>
     )
 }
