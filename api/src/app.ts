@@ -30,8 +30,8 @@ const db = getFirestore()
 db.settings({ ignoreUndefinedProperties: true })
 
 //https
-const sslPrivkey = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/privkey.pem")
-const sslCertificate = fs.readFileSync("/etc/letsencrypt/live/api.guntxjakka.me/fullchain.pem")
+const sslPrivkey = fs.readFileSync(`${process.env.certf}privkey.pem`)
+const sslCertificate = fs.readFileSync(`${process.env.certf}fullchain.pem`)
 const sslCredentials = { key: sslPrivkey, cert: sslCertificate }
 
 //get line credentials
