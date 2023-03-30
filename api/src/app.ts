@@ -51,6 +51,25 @@ const corsOption = {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 }
 
+//create master password for first time run
+const masterPasswordDocRef = db.collection('credentials').doc('mobilemasterkey')
+masterPasswordDocRef.get().then((doc) => {
+    if (!doc.exists){
+        crypto.randomBytes(10, (err, buf) => {
+            crypto.randomBytes(3, (err, buf2) => {
+                const password = buf.toString('base64url')
+                const salt = buf2.toString('base64url')
+                const hash = crypto.createHash('sha256').update(password+salt).digest('hex')
+                masterPasswordDocRef.set({
+                    hash: hash,
+                    salt: salt
+                }).then(() => {console.log(`Fisrt time setup: Adminapp passwd=${password}`)})
+            })
+        })
+        
+    }
+})
+
 //use cors middleware
 app.use(cors(corsOption))
 
