@@ -177,6 +177,7 @@ app.post('/userreg', async (req: Request, res: Response) => {
     const checkRegis = await fst.checkForRegistrationEligibility(docRef)
     if (!checkRegis){
         res.status(403).json({ status: 403, message: "Forbidden. Either user isn't a friend yet or user is already registered." }) 
+        return
     }
 
     try {
