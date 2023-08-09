@@ -86,6 +86,10 @@
       minute: "numeric",
     });
   };
+
+  const openInNewTab = (url: string) => {
+    window.open(url)
+  }
 </script>
 
 <svelte:head>
@@ -147,13 +151,14 @@
                   <Lost />
                 {/if}
                 <td
-                  class="font-Prompt text-gray-900 dark:text-white hover:text-blue-500 underline px-6 py-4"
+                  class="font-Prompt text-gray-900 dark:text-white  underline px-6 py-4"
                 >
-                  <a
+                  <!-- <a
                     href={`https://parcetrace.vercel.app/confirmation?pid=${d.parcelId}`}
                     rel="noreferrer"
                     target="_blank">ยืนยันการรับ</a
-                  >
+                  > -->
+                  <button class="bg-green-600 rounded-md p-2" on:click={() => {openInNewTab(`https://parcetrace.vercel.app/confirmation?pid=${d.parcelId}`)}}>ยืนยันการรับ</button>
                 </td>
               </tr>
             {/each}

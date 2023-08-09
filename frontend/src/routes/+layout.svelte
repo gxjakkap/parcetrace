@@ -11,7 +11,7 @@
     © 2022 - Parcetrace <br /><a
       href="https://raw.githubusercontent.com/gxjakkap/parcetrace/main/COPYING"
       target="_blank"
-      rel="noreferer">Licensed under LGPL-3.0</a
+      rel="noreferrer">Licensed under LGPL-3.0</a
     >
   </p>
 </footer>
